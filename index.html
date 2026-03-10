@@ -3,21 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Onigiri 2 v0.3</title>
+<title>Onigiri 2 v0.31</title>
 <style>
   :root{
     --shell-pink-1:#f7dce7;
     --shell-pink-2:#efc8d7;
     --shell-pink-3:#d7a9bb;
     --shell-line:#c990a9;
-    --shell-shadow:rgba(72,20,44,0.22);
-
     --screen-border:#e6bfd1;
-    --screen-bg:#111;
-    --hud-bg:rgba(12,12,16,0.46);
-    --hud-text:#fff;
+
+    --hud-bg:rgba(12,12,16,0.45);
     --hp:#d4587a;
     --sp:#6eaef5;
+
     --attack:#f06f77;
     --skill:#f2d257;
     --ougie:#f3a44e;
@@ -48,59 +46,55 @@
     overflow:hidden;
   }
 
-  /* HANDHELD / HARDWARE UI */
-
   #deviceShell{
     position:absolute;
     left:50%;
     top:50%;
     transform:translate(-50%,-50%);
-    width:min(92vw,430px);
-    height:min(96vh,900px);
-    border-radius:36px;
+    width:min(86vw,390px);
+    height:min(92vh,820px);
+    border-radius:34px;
     background:linear-gradient(180deg,var(--shell-pink-1),var(--shell-pink-2));
     border:2px solid var(--shell-line);
     box-shadow:
-      0 18px 40px rgba(0,0,0,0.18),
+      0 16px 34px rgba(0,0,0,0.16),
       inset 0 2px 0 rgba(255,255,255,0.7),
-      inset 0 -6px 18px rgba(178,113,140,0.18);
+      inset 0 -6px 18px rgba(178,113,140,0.16);
     overflow:hidden;
   }
 
   #speakerTop{
     position:absolute;
-    top:16px;
+    top:14px;
     left:50%;
     transform:translateX(-50%);
-    width:112px;
-    height:12px;
+    width:100px;
+    height:10px;
     border-radius:8px;
     background:rgba(78,38,56,0.16);
   }
 
   #screenFrame{
     position:absolute;
-    left:22px;
-    right:22px;
-    top:42px;
-    height:55%;
-    border-radius:20px;
+    left:20px;
+    right:20px;
+    top:38px;
+    height:53%;
+    border-radius:18px;
     background:linear-gradient(180deg,#f5e7ee,#ebd1dc);
     border:2px solid var(--screen-border);
-    box-shadow:
-      inset 0 0 0 3px rgba(255,255,255,0.35),
-      inset 0 12px 16px rgba(255,255,255,0.22);
-    padding:10px;
+    box-shadow: inset 0 0 0 3px rgba(255,255,255,0.35);
+    padding:8px;
   }
 
   #gameViewport{
     position:relative;
     width:100%;
     height:100%;
-    border-radius:14px;
+    border-radius:12px;
     overflow:hidden;
     background:#111;
-    border:1px solid rgba(80,40,60,0.28);
+    border:1px solid rgba(80,40,60,0.25);
   }
 
   canvas{
@@ -110,92 +104,165 @@
     background:#111;
   }
 
+  #screenUI{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+  }
+
+  #compactHud{
+    position:absolute;
+    left:6px;
+    top:6px;
+    width:118px;
+    padding:5px 6px;
+    border-radius:9px;
+    background:var(--hud-bg);
+    color:#fff;
+    font-size:9px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.18);
+  }
+
+  .compact-line{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:2px;
+  }
+
+  .mini-bar{
+    width:100%;
+    height:6px;
+    border-radius:999px;
+    overflow:hidden;
+    background:rgba(255,255,255,0.12);
+    margin-bottom:3px;
+  }
+
+  .mini-fill{
+    height:100%;
+    width:100%;
+  }
+
+  #hpFill{ background:var(--hp); }
+  #spFill{ background:var(--sp); }
+
+  #miniStats{
+    color:#e6d6e3;
+    font-size:8px;
+  }
+
+  #zoneToast{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+    min-width:84px;
+    max-width:58%;
+    text-align:center;
+    padding:4px 8px;
+    border-radius:999px;
+    background:rgba(14,14,18,0.58);
+    color:#fff;
+    font-size:10px;
+    letter-spacing:0.3px;
+    opacity:0;
+    transition:opacity 0.35s ease;
+  }
+
+  #zoneToast.show{
+    opacity:1;
+  }
+
+  #infoBar{
+    position:absolute;
+    left:6px;
+    bottom:6px;
+    width:46%;
+    max-height:56px;
+    overflow:hidden;
+    border-radius:9px;
+    background:rgba(10,10,14,0.40);
+    color:#fff;
+    padding:5px 7px;
+    font-size:8px;
+    line-height:1.25;
+  }
+
   .shoulder{
     position:absolute;
-    top:calc(55% + 56px);
-    width:78px;
-    height:28px;
+    top:calc(53% + 52px);
+    width:70px;
+    height:24px;
     border-radius:12px;
     background:linear-gradient(180deg,#e5c1d0,#cb9fb2);
     border:1px solid var(--shell-line);
     color:#734558;
     font-weight:bold;
-    font-size:14px;
+    font-size:12px;
     display:flex;
     align-items:center;
     justify-content:center;
     box-shadow:0 4px 8px rgba(0,0,0,0.12);
   }
 
-  #btnL{ left:34px; }
-  #btnR{ right:34px; }
+  #btnL{ left:30px; }
+  #btnR{ right:30px; }
 
   #controlsArea{
     position:absolute;
     left:0;
     right:0;
     bottom:0;
-    top:calc(55% + 78px);
+    top:calc(53% + 68px);
   }
 
-  #dpadWrap{
+  /* JOYSTICK */
+  #joystickArea{
     position:absolute;
-    left:28px;
-    bottom:74px;
-    width:138px;
-    height:138px;
+    left:22px;
+    bottom:62px;
+    width:128px;
+    height:128px;
   }
 
-  .dpad-piece{
+  #joyBase{
     position:absolute;
-    background:linear-gradient(180deg,#f6edf1,#dfc6d2);
+    inset:0;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff6fa, #dfc2cf);
     border:1px solid #b98ca0;
-    color:#7b5061;
-    font-weight:bold;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow:0 3px 6px rgba(0,0,0,0.12);
+    box-shadow:0 4px 8px rgba(0,0,0,0.12);
   }
 
-  #dpadUp,#dpadDown{
-    width:46px;
-    height:52px;
-    left:46px;
-    border-radius:10px;
-  }
-
-  #dpadUp{ top:0; }
-  #dpadDown{ bottom:0; }
-
-  #dpadLeft,#dpadRight{
-    width:52px;
-    height:46px;
-    top:46px;
-    border-radius:10px;
-  }
-
-  #dpadLeft{ left:0; }
-  #dpadRight{ right:0; }
-
-  #dpadCenter{
+  #joyInnerRing{
     position:absolute;
-    left:46px;
-    top:46px;
-    width:46px;
-    height:46px;
-    border-radius:12px;
-    background:linear-gradient(180deg,#f5e8ee,#d9beca);
-    border:1px solid #b98ca0;
-    box-shadow:0 3px 6px rgba(0,0,0,0.12);
+    left:18px;
+    top:18px;
+    width:92px;
+    height:92px;
+    border-radius:50%;
+    border:1px solid rgba(121,76,96,0.18);
+    background:rgba(255,255,255,0.18);
+  }
+
+  #joyStick{
+    position:absolute;
+    left:42px;
+    top:42px;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff, #d7b6c5);
+    border:1px solid #ad7d93;
+    box-shadow:0 3px 8px rgba(0,0,0,0.14);
   }
 
   #rightCluster{
     position:absolute;
-    right:22px;
-    bottom:58px;
-    width:176px;
-    height:238px;
+    right:18px;
+    bottom:52px;
+    width:160px;
+    height:216px;
   }
 
   .shell-btn{
@@ -205,7 +272,7 @@
     color:#fff;
     font-weight:bold;
     box-shadow:
-      0 6px 10px rgba(0,0,0,0.16),
+      0 5px 9px rgba(0,0,0,0.16),
       inset 0 2px 0 rgba(255,255,255,0.28);
     transform:translateZ(0);
   }
@@ -215,99 +282,65 @@
   }
 
   #attackBtn{
-    right:20px;
+    right:18px;
     top:0;
-    width:76px;
-    height:76px;
+    width:66px;
+    height:66px;
     background:radial-gradient(circle at 30% 30%, #ff9aa1, var(--attack));
-    font-size:16px;
+    font-size:15px;
   }
 
   .skill-btn{
-    width:58px;
-    height:58px;
+    width:48px;
+    height:48px;
     background:radial-gradient(circle at 30% 30%, #fff0a6, var(--skill));
     color:#6d5310;
-    font-size:14px;
+    font-size:12px;
   }
 
-  #skill1{ left:10px; top:38px; }
-  #skill2{ left:0; top:104px; }
-  #skill3{ left:22px; top:168px; }
+  #skill1{ left:14px; top:34px; }
+  #skill2{ left:0; top:88px; }
+  #skill3{ left:18px; top:142px; }
 
   .ougie-btn{
-    width:60px;
-    height:60px;
+    width:50px;
+    height:50px;
     background:radial-gradient(circle at 30% 30%, #ffd09d, var(--ougie));
     color:#7b4311;
-    font-size:14px;
+    font-size:12px;
   }
 
-  #ougie1{ right:72px; top:112px; }
-  #ougie2{ right:10px; top:158px; }
+  #ougie1{ right:64px; top:94px; }
+  #ougie2{ right:8px; top:136px; }
 
   #itemUseBtn{
     right:0;
     bottom:0;
-    width:66px;
-    height:66px;
+    width:56px;
+    height:56px;
     background:radial-gradient(circle at 30% 30%, #c9f8b1, var(--item));
     color:#29551a;
-    font-size:13px;
-  }
-
-  #menuBtn{
-    position:absolute;
-    left:50%;
-    bottom:28px;
-    transform:translateX(-50%);
-    width:72px;
-    height:32px;
-    border-radius:999px;
-    border:none;
-    background:linear-gradient(180deg,#f8eef2,#debfcd);
-    border:1px solid #b98ca0;
-    color:#734558;
-    font-size:12px;
-    font-weight:bold;
-    box-shadow:0 3px 6px rgba(0,0,0,0.1);
-  }
-
-  #startBtn,#selectBtn{
-    position:absolute;
-    bottom:31px;
-    width:58px;
-    height:24px;
-    border-radius:999px;
-    border:none;
-    background:linear-gradient(180deg,#f8eef2,#debfcd);
-    border:1px solid #b98ca0;
-    color:#734558;
     font-size:11px;
-    font-weight:bold;
   }
-
-  #selectBtn{ left:110px; }
-  #startBtn{ right:110px; }
 
   #itemBarWrap{
     position:absolute;
-    left:190px;
-    right:108px;
-    bottom:82px;
+    left:164px;
+    right:92px;
+    bottom:76px;
     display:flex;
     justify-content:center;
-    gap:6px;
+    gap:5px;
   }
 
   .item-slot{
-    width:34px;
-    height:34px;
-    border-radius:9px;
-    background:rgba(255,255,255,0.46);
+    width:30px;
+    height:30px;
+    border-radius:8px;
+    background:rgba(255,255,255,0.48);
     border:1px solid rgba(153,102,123,0.45);
     color:#6b4154;
-    font-size:9px;
+    font-size:8px;
     line-height:1.05;
     display:flex;
     align-items:center;
@@ -321,94 +354,45 @@
     background:rgba(255,255,255,0.78);
   }
 
-  /* SCREEN UI */
-
-  #screenUI{
+  #menuBtn{
     position:absolute;
-    inset:0;
-    pointer-events:none;
-  }
-
-  #compactHud{
-    position:absolute;
-    left:8px;
-    top:8px;
-    width:136px;
-    padding:6px 7px;
-    border-radius:10px;
-    background:var(--hud-bg);
-    color:var(--hud-text);
-    font-size:10px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.18);
-  }
-
-  .compact-line{
-    display:flex;
-    justify-content:space-between;
-    margin-bottom:3px;
-  }
-
-  .mini-bar{
-    width:100%;
-    height:7px;
-    border-radius:999px;
-    overflow:hidden;
-    background:rgba(255,255,255,0.12);
-    margin-bottom:4px;
-  }
-
-  .mini-fill{
-    height:100%;
-    width:100%;
-  }
-
-  #hpFill{ background:var(--hp); }
-  #spFill{ background:var(--sp); }
-
-  #zoneToast{
-    position:absolute;
-    top:10px;
     left:50%;
+    bottom:24px;
     transform:translateX(-50%);
-    min-width:110px;
-    max-width:70%;
-    text-align:center;
-    padding:5px 10px;
+    width:64px;
+    height:28px;
     border-radius:999px;
-    background:rgba(14,14,18,0.52);
-    color:#fff;
+    border:none;
+    background:linear-gradient(180deg,#f8eef2,#debfcd);
+    border:1px solid #b98ca0;
+    color:#734558;
     font-size:11px;
-    letter-spacing:0.4px;
-    opacity:0;
-    transition:opacity 0.35s ease;
+    font-weight:bold;
+    box-shadow:0 3px 6px rgba(0,0,0,0.1);
   }
 
-  #zoneToast.show{
-    opacity:1;
-  }
-
-  #infoBar{
+  #startBtn,#selectBtn{
     position:absolute;
-    left:8px;
-    bottom:8px;
-    width:42%;
-    max-height:66px;
-    overflow:hidden;
-    border-radius:10px;
-    background:rgba(10,10,14,0.42);
-    color:#fff;
-    padding:6px 8px;
-    font-size:9px;
-    line-height:1.3;
+    bottom:27px;
+    width:52px;
+    height:22px;
+    border-radius:999px;
+    border:none;
+    background:linear-gradient(180deg,#f8eef2,#debfcd);
+    border:1px solid #b98ca0;
+    color:#734558;
+    font-size:10px;
+    font-weight:bold;
   }
 
-  /* MENU */
+  #selectBtn{ left:98px; }
+  #startBtn{ right:98px; }
 
   #menuPanel{
     position:absolute;
-    inset:16px;
+    inset:14px;
     border-radius:16px;
-    background:rgba(24,19,25,0.96);
+    background:rgba(24,19,25,0.97);
     border:1px solid rgba(255,255,255,0.14);
     display:none;
     z-index:100;
@@ -418,7 +402,7 @@
 
   #menuHeader{
     display:flex;
-    height:44px;
+    height:40px;
     background:#372a35;
   }
 
@@ -428,6 +412,7 @@
     background:#4b3946;
     color:#fff;
     font-weight:bold;
+    font-size:12px;
   }
 
   .tabBtn.active{
@@ -436,9 +421,9 @@
 
   #menuContent{
     padding:10px;
-    height:calc(100% - 44px);
+    height:calc(100% - 40px);
     overflow:auto;
-    font-size:13px;
+    font-size:12px;
   }
 
   .row{
@@ -448,8 +433,8 @@
     gap:8px;
     background:rgba(255,255,255,0.06);
     border-radius:10px;
-    padding:9px;
-    margin-bottom:7px;
+    padding:8px;
+    margin-bottom:6px;
   }
 
   .small-btn{
@@ -457,21 +442,21 @@
     background:#8d6074;
     color:#fff;
     border-radius:8px;
-    padding:6px 8px;
-    font-size:11px;
+    padding:5px 8px;
+    font-size:10px;
   }
 
   .subtle{
     color:#d9ccda;
-    font-size:11px;
+    font-size:10px;
   }
 
   @media (max-height:760px){
     #deviceShell{
       height:100vh;
-      border-radius:0;
       width:100vw;
       max-width:none;
+      border-radius:0;
     }
   }
 </style>
@@ -493,11 +478,10 @@
             <div class="compact-line"><span>SP</span><span id="spText">100/100</span></div>
             <div class="mini-bar"><div id="spFill" class="mini-fill"></div></div>
 
-            <div class="subtle" id="miniStats">ATK 2000 | DEF 2000</div>
+            <div id="miniStats">ATK 2000 | DEF 2000</div>
           </div>
 
           <div id="zoneToast">Temporal Rift</div>
-
           <div id="infoBar"></div>
         </div>
       </div>
@@ -507,23 +491,21 @@
     <div id="btnR" class="shoulder">R</div>
 
     <div id="controlsArea">
-      <div id="dpadWrap">
-        <button id="dpadUp" class="dpad-piece">▲</button>
-        <button id="dpadLeft" class="dpad-piece">◀</button>
-        <div id="dpadCenter"></div>
-        <button id="dpadRight" class="dpad-piece">▶</button>
-        <button id="dpadDown" class="dpad-piece">▼</button>
+      <div id="joystickArea">
+        <div id="joyBase"></div>
+        <div id="joyInnerRing"></div>
+        <div id="joyStick"></div>
       </div>
 
       <div id="rightCluster">
         <button id="attackBtn" class="shell-btn">ATK</button>
 
-        <button id="skill1" class="shell-btn skill-btn"></button>
-        <button id="skill2" class="shell-btn skill-btn"></button>
-        <button id="skill3" class="shell-btn skill-btn"></button>
+        <button id="skill1" class="shell-btn skill-btn">S1</button>
+        <button id="skill2" class="shell-btn skill-btn">S2</button>
+        <button id="skill3" class="shell-btn skill-btn">S3</button>
 
-        <button id="ougie1" class="shell-btn ougie-btn"></button>
-        <button id="ougie2" class="shell-btn ougie-btn"></button>
+        <button id="ougie1" class="shell-btn ougie-btn">O1</button>
+        <button id="ougie2" class="shell-btn ougie-btn">O2</button>
 
         <button id="itemUseBtn" class="shell-btn">ITEM</button>
       </div>
@@ -548,8 +530,8 @@
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-
 const viewport = document.getElementById("gameViewport");
+
 const hpText = document.getElementById("hpText");
 const spText = document.getElementById("spText");
 const hpFill = document.getElementById("hpFill");
@@ -572,11 +554,13 @@ const skillButtons = [
   document.getElementById("skill2"),
   document.getElementById("skill3")
 ];
-
 const ougieButtons = [
   document.getElementById("ougie1"),
   document.getElementById("ougie2")
 ];
+
+const joyArea = document.getElementById("joystickArea");
+const joyStick = document.getElementById("joyStick");
 
 function resizeCanvas(){
   canvas.width = viewport.clientWidth;
@@ -585,11 +569,13 @@ function resizeCanvas(){
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-const GAME_VERSION = "0.3";
+const GAME_VERSION = "0.31";
 let activeTab = "player";
 let currentZone = "Temporal Rift";
 let messages = [];
 let zoneToastTimer = null;
+let enemies = [];
+let joystick = { active:false, dx:0, dy:0 };
 
 function showZone(name){
   currentZone = name;
@@ -617,9 +603,7 @@ const ItemDatabase = {
   "Unidentified Weapon ??? - Yamanaka": { type:"weapon_material" },
   "Painful Choice Papers": { type:"material" },
   "Photoshopped Photos": { type:"material" },
-  "Familiar Sword": { type:"weapon", weaponClass:"Sword", attack:1000, skills:["","",""], ougies:["",""] },
-  "Familiar Bow": { type:"weapon", weaponClass:"Bow", attack:1000, skills:["","",""], ougies:["",""] },
-  "Familiar Twin Swords": { type:"weapon", weaponClass:"Twin Sword", attack:1000, skills:["","",""], ougies:["",""] }
+  "Familiar Sword": { type:"weapon", weaponClass:"Sword", attack:1000, skills:["","",""], ougies:["",""] }
 };
 
 class InventorySystem{
@@ -627,7 +611,6 @@ class InventorySystem{
     this.items = {};
     this.maxStack = 9999;
   }
-
   addItem(name, qty=1){
     const cur = this.items[name] || 0;
     this.items[name] = clamp(cur + qty, 0, this.maxStack);
@@ -636,7 +619,6 @@ class InventorySystem{
     renderItemBar();
     saveGame();
   }
-
   removeItem(name, qty=1){
     if(!this.items[name]) return false;
     this.items[name] -= qty;
@@ -646,7 +628,6 @@ class InventorySystem{
     saveGame();
     return true;
   }
-
   getSortedItems(){
     return Object.keys(this.items).sort((a,b) => a.localeCompare(b));
   }
@@ -654,26 +635,22 @@ class InventorySystem{
 
 class EquipmentSystem{
   constructor(){
-    this.weapons = [null, null, null, null];
-    this.accessories = [null, null];
-    this.magatama = [null, null, null, null];
+    this.weapons = [null,null,null,null];
+    this.accessories = [null,null];
+    this.magatama = [null,null,null,null];
     this.activeWeaponIndex = 0;
   }
-
   getActiveWeapon(){
     return this.weapons[this.activeWeaponIndex];
   }
-
   equipWeapon(itemName){
     const data = ItemDatabase[itemName];
     if(!data || data.type !== "weapon") return false;
-
     const empty = this.weapons.findIndex(w => w === null);
     if(empty === -1){
       logMessage("No empty weapon slot.");
       return false;
     }
-
     this.weapons[empty] = JSON.parse(JSON.stringify({
       name:itemName,
       weaponClass:data.weaponClass,
@@ -681,7 +658,6 @@ class EquipmentSystem{
       skills:data.skills || ["","",""],
       ougies:data.ougies || ["",""]
     }));
-
     inventory.removeItem(itemName,1);
     logMessage(itemName + " equipped.");
     updateButtons();
@@ -690,12 +666,10 @@ class EquipmentSystem{
     saveGame();
     return true;
   }
-
   getTotalAttack(){
     const active = this.getActiveWeapon();
     return active ? active.attack : 0;
   }
-
   getTotalDefense(){
     return 1000;
   }
@@ -709,51 +683,42 @@ class Player{
     this.y = 126;
     this.w = 18;
     this.h = 22;
-
     this.maxHP = 100;
     this.hp = 100;
     this.maxSP = 100;
     this.sp = 100;
-
     this.attackBase = 1000;
     this.defenseBase = 1000;
     this.critRate = 0;
     this.critForce = 170;
-    this.moveSpeed = 1.8;
-
+    this.moveSpeed = 1.7;
     this.zone = "Temporal Rift";
-    this.quickItems = [null, null, null, null, null];
+    this.quickItems = [null,null,null,null,null];
     this.selectedQuickItem = 0;
     this.livesInDungeon = 4;
   }
-
   getAttack(){
     return this.attackBase + equipment.getTotalAttack();
   }
-
   getDefense(){
     return this.defenseBase + equipment.getTotalDefense();
   }
-
   move(dx,dy){
     this.x += dx * this.moveSpeed;
     this.y += dy * this.moveSpeed;
     this.x = clamp(this.x, 0, canvas.width - this.w);
     this.y = clamp(this.y, 0, canvas.height - this.h);
   }
-
   heal(amount){
     this.hp = clamp(this.hp + amount, 0, this.maxHP);
     updateHud();
   }
-
   takeDamage(amount){
     this.hp -= amount;
     if(this.hp < 0) this.hp = 0;
     updateHud();
     if(this.hp <= 0) this.onDeath();
   }
-
   onDeath(){
     logMessage("You died. Resetting position.");
     this.hp = this.maxHP;
@@ -763,14 +728,12 @@ class Player{
     updateHud();
     saveGame();
   }
-
   useSelectedItem(){
     const itemName = this.quickItems[this.selectedQuickItem];
     if(!itemName){
       logMessage("No item selected.");
       return;
     }
-
     const data = ItemDatabase[itemName];
     if(!data || !inventory.items[itemName]){
       logMessage("That item is unavailable.");
@@ -779,17 +742,15 @@ class Player{
       saveGame();
       return;
     }
-
     if(data.type === "consumable"){
       if(data.healHP){
         this.heal(data.healHP);
         logMessage("Used " + itemName + ".");
       }
       inventory.removeItem(itemName,1);
-    }else{
+    } else {
       logMessage("That item cannot be used here yet.");
     }
-
     renderItemBar();
     saveGame();
   }
@@ -798,6 +759,8 @@ class Player{
 class Enemy{
   constructor(type, x, y, color){
     this.type = type;
+    this.spawnX = x;
+    this.spawnY = y;
     this.x = x;
     this.y = y;
     this.w = 16;
@@ -805,9 +768,12 @@ class Enemy{
     this.hp = 5;
     this.maxHP = 5;
     this.color = color;
-    this.detectRange = 72;
-    this.attackRange = 20;
+    this.state = "idle";
+    this.detectRange = 70;
+    this.attackRange = 18;
     this.cooldown = 0;
+    this.wanderTimer = 0;
+    this.wanderAngle = Math.random() * Math.PI * 2;
   }
 
   update(){
@@ -816,6 +782,30 @@ class Enemy{
     const dist = Math.hypot(dx,dy);
 
     if(dist <= this.detectRange){
+      this.state = "chase";
+    } else if(this.state === "chase" && dist > this.detectRange + 18){
+      this.state = "idle";
+    }
+
+    if(this.state === "idle"){
+      this.wanderTimer--;
+      if(this.wanderTimer <= 0){
+        this.wanderTimer = 45 + Math.floor(Math.random() * 60);
+        this.wanderAngle = Math.random() * Math.PI * 2;
+      }
+      this.x += Math.cos(this.wanderAngle) * 0.18;
+      this.y += Math.sin(this.wanderAngle) * 0.18;
+
+      if(Math.hypot(this.x - this.spawnX, this.y - this.spawnY) > 18){
+        const rdx = this.spawnX - this.x;
+        const rdy = this.spawnY - this.y;
+        const rdist = Math.hypot(rdx, rdy) || 1;
+        this.x += (rdx / rdist) * 0.35;
+        this.y += (rdy / rdist) * 0.35;
+      }
+    }
+
+    if(this.state === "chase"){
       if(dist > this.attackRange){
         const nx = dx / (dist || 1);
         const ny = dy / (dist || 1);
@@ -858,8 +848,6 @@ class Enemy{
 const inventory = new InventorySystem();
 const equipment = new EquipmentSystem();
 const player = new Player();
-let enemies = [];
-const movement = {up:false, down:false, left:false, right:false};
 
 function seedInitialData(){
   if(Object.keys(inventory.items).length === 0){
@@ -904,38 +892,22 @@ function spawnDimensionOfMemories(){
 function updateHud(){
   hpText.textContent = Math.floor(player.hp) + "/" + player.maxHP;
   spText.textContent = Math.floor(player.sp) + "/" + player.maxSP;
-
   hpFill.style.width = ((player.hp / player.maxHP) * 100) + "%";
   spFill.style.width = ((player.sp / player.maxSP) * 100) + "%";
-
   miniStats.textContent = "ATK " + player.getAttack() + " | DEF " + player.getDefense();
 }
 
 function updateButtons(){
   const active = equipment.getActiveWeapon();
 
-  attackBtn.textContent = "ATK";
-
-  if(!active){
-    skillButtons.forEach(btn => {
-      btn.textContent = "";
-      btn.style.opacity = 0.55;
-    });
-    ougieButtons.forEach(btn => {
-      btn.textContent = "";
-      btn.style.opacity = 0.55;
-    });
-    return;
-  }
-
   skillButtons.forEach((btn, i) => {
-    btn.textContent = active.skills[i] ? "S" + (i+1) : "";
-    btn.style.opacity = active.skills[i] ? 1 : 0.75;
+    btn.textContent = "S" + (i + 1);
+    btn.style.opacity = active && active.skills[i] ? 1 : 0.78;
   });
 
   ougieButtons.forEach((btn, i) => {
-    btn.textContent = active.ougies[i] ? "O" + (i+1) : "";
-    btn.style.opacity = active.ougies[i] ? 1 : 0.75;
+    btn.textContent = "O" + (i + 1);
+    btn.style.opacity = active && active.ougies[i] ? 1 : 0.78;
   });
 }
 
@@ -946,40 +918,30 @@ function renderItemBar(){
     el.className = "item-slot" + (player.selectedQuickItem === i ? " selected" : "");
     const item = player.quickItems[i];
     if(item){
-      const shortName = item
-        .replace("Mega Potion","M-Pot")
-        .replace("Potion","Pot")
-        .replace("Skill Card","Skill");
+      const shortName = item.replace("Mega Potion","M-P").replace("Potion","Pot").replace("Skill Card","SC");
       el.textContent = shortName;
     } else {
       el.textContent = "";
     }
-
     el.onclick = () => {
       player.selectedQuickItem = i;
       renderItemBar();
       saveGame();
     };
-
     itemBarWrap.appendChild(el);
   }
 }
 
 function renderMenu(){
   if(menuPanel.style.display === "none") return;
-
-  if(activeTab === "player"){
-    renderPlayerMenu();
-  } else {
-    renderInventoryMenu();
-  }
+  if(activeTab === "player") renderPlayerMenu();
+  else renderInventoryMenu();
 }
 
 function renderPlayerMenu(){
   const active = equipment.getActiveWeapon();
   menuContent.innerHTML = `
-    <div style="font-weight:bold; font-size:17px; margin-bottom:10px;">Player Panel</div>
-
+    <div style="font-weight:bold; font-size:16px; margin-bottom:10px;">Player Panel</div>
     <div class="subtle" style="margin-bottom:10px;">
       Name: ${player.name}<br>
       Body Type: ${player.bodyType}<br>
@@ -1012,7 +974,7 @@ function renderPlayerMenu(){
 function renderInventoryMenu(){
   const items = inventory.getSortedItems();
   menuContent.innerHTML = `
-    <div style="font-weight:bold; font-size:17px; margin-bottom:10px;">Inventory</div>
+    <div style="font-weight:bold; font-size:16px; margin-bottom:10px;">Inventory</div>
     ${items.length ? items.map(itemName => `
       <div class="row">
         <div>
@@ -1048,13 +1010,9 @@ function addToQuickBar(itemName){
     logMessage("Only recovery/boost items go there.");
     return;
   }
-
   const empty = player.quickItems.findIndex(s => s === null);
-  if(empty === -1){
-    player.quickItems[player.selectedQuickItem] = itemName;
-  } else {
-    player.quickItems[empty] = itemName;
-  }
+  if(empty === -1) player.quickItems[player.selectedQuickItem] = itemName;
+  else player.quickItems[empty] = itemName;
 
   logMessage(itemName + " added to quick bar.");
   renderItemBar();
@@ -1063,17 +1021,13 @@ function addToQuickBar(itemName){
 
 function tryEquipItem(itemName){
   const data = ItemDatabase[itemName];
-  if(data && data.type === "weapon"){
-    equipment.equipWeapon(itemName);
-  } else {
-    logMessage("That cannot be equipped yet.");
-  }
+  if(data && data.type === "weapon") equipment.equipWeapon(itemName);
+  else logMessage("That cannot be equipped yet.");
 }
 
 function useInventoryItem(itemName){
   const data = ItemDatabase[itemName];
   if(!data) return;
-
   if(data.type === "consumable"){
     if(data.healHP){
       player.heal(data.healHP);
@@ -1085,7 +1039,6 @@ function useInventoryItem(itemName){
   } else {
     logMessage(itemName + " cannot be used yet.");
   }
-
   renderMenu();
   saveGame();
 }
@@ -1110,13 +1063,11 @@ function performBasicAttack(){
     }
   });
 
-  if(!hit){
-    logMessage("Attack missed.");
-  }
+  if(!hit) logMessage("Attack missed.");
   saveGame();
 }
 
-function dropLoot(enemyType){
+function dropLoot(){
   const pool = [
     "Potion",
     "Painful Choice Papers",
@@ -1154,19 +1105,16 @@ function saveGame(){
 function loadGame(){
   const raw = localStorage.getItem("onigiri2_save");
   if(!raw) return false;
-
   try{
     const save = JSON.parse(raw);
     if(save.player) Object.assign(player, save.player);
     if(save.inventory) inventory.items = save.inventory;
-
     if(save.equipment){
       equipment.weapons = save.equipment.weapons || [null,null,null,null];
       equipment.accessories = save.equipment.accessories || [null,null];
       equipment.magatama = save.equipment.magatama || [null,null,null,null];
       equipment.activeWeaponIndex = save.equipment.activeWeaponIndex || 0;
     }
-
     player.zone = save.player?.zone || "Temporal Rift";
     return true;
   }catch(e){
@@ -1176,9 +1124,7 @@ function loadGame(){
 }
 
 function drawTemporalRift(){
-  const w = canvas.width;
-  const h = canvas.height;
-
+  const w = canvas.width, h = canvas.height;
   ctx.fillStyle = "#d9dde5";
   ctx.fillRect(0,0,w,h);
 
@@ -1206,14 +1152,12 @@ function drawTemporalRift(){
   ctx.arc(w*0.476 + 6, h*0.35, 10, 0, Math.PI * 2);
   ctx.fill();
 
-  // Aoi
   ctx.fillStyle = "#7fd1ff";
   ctx.fillRect(w*0.44, h*0.51, 12, 18);
-  // Akane
+
   ctx.fillStyle = "#ff88a8";
   ctx.fillRect(w*0.52, h*0.51, 12, 18);
 
-  // portal
   ctx.fillStyle = "rgba(74,168,255,0.85)";
   ctx.beginPath();
   ctx.arc(w*0.79, h*0.56, 18, 0, Math.PI * 2);
@@ -1221,9 +1165,7 @@ function drawTemporalRift(){
 }
 
 function drawDimensionOfMemories(){
-  const w = canvas.width;
-  const h = canvas.height;
-
+  const w = canvas.width, h = canvas.height;
   ctx.fillStyle = "#8d958b";
   ctx.fillRect(0,0,w,h);
 
@@ -1270,20 +1212,12 @@ function drawPlayer(){
 function update(){
   if(menuPanel.style.display !== "none") return;
 
-  let dx = 0, dy = 0;
-  if(movement.up) dy -= 1;
-  if(movement.down) dy += 1;
-  if(movement.left) dx -= 1;
-  if(movement.right) dx += 1;
-
-  if(dx !== 0 || dy !== 0){
-    const len = Math.hypot(dx,dy) || 1;
-    player.move(dx/len, dy/len);
+  if(joystick.dx !== 0 || joystick.dy !== 0){
+    player.move(joystick.dx, joystick.dy);
   }
 
   enemies.forEach(enemy => enemy.update());
 
-  // simple portal in Temporal Rift
   if(currentZone === "Temporal Rift"){
     const portalX = canvas.width * 0.79;
     const portalY = canvas.height * 0.56;
@@ -1305,12 +1239,8 @@ function update(){
 
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  if(currentZone === "Temporal Rift"){
-    drawTemporalRift();
-  } else {
-    drawDimensionOfMemories();
-  }
+  if(currentZone === "Temporal Rift") drawTemporalRift();
+  else drawDimensionOfMemories();
 
   enemies.forEach(enemy => enemy.draw());
   drawPlayer();
@@ -1322,23 +1252,63 @@ function loop(){
   requestAnimationFrame(loop);
 }
 
-function bindHoldButton(el, key){
-  const on = (e) => { e.preventDefault(); movement[key] = true; };
-  const off = (e) => { e.preventDefault(); movement[key] = false; };
-
-  el.addEventListener("touchstart", on, { passive:false });
-  el.addEventListener("touchend", off, { passive:false });
-  el.addEventListener("touchcancel", off, { passive:false });
-
-  el.addEventListener("mousedown", on);
-  el.addEventListener("mouseup", off);
-  el.addEventListener("mouseleave", off);
+/* JOYSTICK */
+function resetJoystickVisual(){
+  joyStick.style.left = "42px";
+  joyStick.style.top = "42px";
 }
 
-bindHoldButton(document.getElementById("dpadUp"), "up");
-bindHoldButton(document.getElementById("dpadDown"), "down");
-bindHoldButton(document.getElementById("dpadLeft"), "left");
-bindHoldButton(document.getElementById("dpadRight"), "right");
+function updateJoystickFromEvent(clientX, clientY){
+  const rect = joyArea.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  let dx = clientX - cx;
+  let dy = clientY - cy;
+
+  const max = 34;
+  const dist = Math.hypot(dx, dy);
+
+  if(dist > max){
+    dx = dx / dist * max;
+    dy = dy / dist * max;
+  }
+
+  joyStick.style.left = (42 + dx) + "px";
+  joyStick.style.top = (42 + dy) + "px";
+
+  joystick.dx = dx / max;
+  joystick.dy = dy / max;
+}
+
+joyArea.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  const t = e.touches[0];
+  joystick.active = true;
+  updateJoystickFromEvent(t.clientX, t.clientY);
+}, { passive:false });
+
+joyArea.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+  if(!joystick.active) return;
+  const t = e.touches[0];
+  updateJoystickFromEvent(t.clientX, t.clientY);
+}, { passive:false });
+
+joyArea.addEventListener("touchend", (e) => {
+  e.preventDefault();
+  joystick.active = false;
+  joystick.dx = 0;
+  joystick.dy = 0;
+  resetJoystickVisual();
+}, { passive:false });
+
+joyArea.addEventListener("touchcancel", (e) => {
+  e.preventDefault();
+  joystick.active = false;
+  joystick.dx = 0;
+  joystick.dy = 0;
+  resetJoystickVisual();
+}, { passive:false });
 
 menuBtn.onclick = () => {
   menuPanel.style.display = menuPanel.style.display === "none" ? "block" : "none";
@@ -1375,7 +1345,7 @@ if(!loadGame()){
   renderItemBar();
 }
 
-logMessage("Onigiri 2 v0.3 loaded.");
+logMessage("Onigiri 2 v0.31 loaded.");
 loop();
 </script>
 </body>
