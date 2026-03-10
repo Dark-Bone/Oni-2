@@ -1,241 +1,1108 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Onigiri Prototype</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Onigiri 2 v0.2</title>
 <style>
-body{
-margin:0;
-overflow:hidden;
-background:black;
-color:white;
-font-family:sans-serif;
-}
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+    font-family: Arial, sans-serif;
+    touch-action: none;
+  }
 
-#infoBar{
-position:absolute;
-bottom:10px;
-left:10px;
-width:80%;
-height:80px;
-background:rgba(0,0,0,0.6);
-padding:10px;
-font-size:14px;
-overflow:hidden;
-}
+  canvas {
+    display: block;
+    background: #111;
+  }
 
-#attackButton{
-position:absolute;
-right:20px;
-bottom:120px;
-width:80px;
-height:80px;
-background:red;
-border-radius:40px;
-text-align:center;
-line-height:80px;
-font-weight:bold;
-}
+  .ui-btn {
+    position: absolute;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 16px;
+    opacity: 0.88;
+    box-shadow: 0 0 8px rgba(0,0,0,0.5);
+  }
 
-canvas{
-background:#1a1a1a;
-}
+  .ui-btn:active {
+    transform: scale(0.97);
+    opacity: 1;
+  }
+
+  #menuBtn {
+    top: 14px;
+    right: 14px;
+    width: 84px;
+    height: 42px;
+    background: #444;
+    z-index: 20;
+  }
+
+  #attackBtn {
+    right: 18px;
+    bottom: 310px;
+    width: 92px;
+    height: 60px;
+    background: #c62828;
+    z-index: 20;
+  }
+
+  .skill-btn {
+    right: 18px;
+    width: 108px;
+    height: 42px;
+    background: #d4a017;
+    z-index: 20;
+  }
+
+  #skill1 { bottom: 258px; }
+  #skill2 { bottom: 210px; }
+  #skill3 { bottom: 162px; }
+
+  .ougie-btn {
+    right: 18px;
+    width: 108px;
+    height: 42px;
+    background: #d96a1d;
+    z-index: 20;
+  }
+
+  #ougie1 { bottom: 112px; }
+  #ougie2 { bottom: 64px; }
+
+  #itemUseBtn {
+    right: 18px;
+    bottom: 12px;
+    width: 108px;
+    height: 42px;
+    background: #2e7d32;
+    z-index: 20;
+  }
+
+  #itemBar {
+    position: absolute;
+    right: 140px;
+    bottom: 12px;
+    display: flex;
+    gap: 6px;
+    z-index: 20;
+  }
+
+  .item-slot {
+    width: 56px;
+    height: 42px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2px;
+    box-sizing: border-box;
+  }
+
+  .item-slot.selected {
+    outline: 2px solid #fff;
+    background: rgba(255,255,255,0.22);
+  }
+
+  #infoBar {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    width: calc(100% - 270px);
+    min-height: 74px;
+    max-height: 120px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.56);
+    color: #fff;
+    border-radius: 12px;
+    padding: 8px 10px;
+    font-size: 13px;
+    z-index: 20;
+    box-sizing: border-box;
+  }
+
+  #statusHud {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 220px;
+    background: rgba(0,0,0,0.58);
+    border-radius: 12px;
+    padding: 8px;
+    color: #fff;
+    z-index: 20;
+    box-sizing: border-box;
+  }
+
+  .bar-wrap {
+    width: 100%;
+    height: 16px;
+    background: rgba(255,255,255,0.16);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 4px;
+    margin-bottom: 8px;
+  }
+
+  .hp-bar {
+    height: 100%;
+    background: #d32f2f;
+    width: 100%;
+  }
+
+  .sp-bar {
+    height: 100%;
+    background: #1976d2;
+    width: 100%;
+  }
+
+  #zoneLabel {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 12px;
+    z-index: 20;
+    font-weight: bold;
+  }
+
+  #touchPad {
+    position: absolute;
+    left: 18px;
+    bottom: 18px;
+    width: 142px;
+    height: 142px;
+    z-index: 20;
+  }
+
+  .move-btn {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    color: #fff;
+    font-weight: bold;
+  }
+
+  #upBtn { left: 47px; top: 0; }
+  #leftBtn { left: 0; top: 47px; }
+  #rightBtn { right: 0; top: 47px; }
+  #downBtn { left: 47px; bottom: 0; }
+
+  #menuPanel {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(92vw, 480px);
+    height: min(78vh, 640px);
+    background: rgba(20,20,24,0.96);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    display: none;
+    z-index: 50;
+    color: #fff;
+    overflow: hidden;
+  }
+
+  #menuHeader {
+    display: flex;
+    background: #22242d;
+    height: 52px;
+  }
+
+  .tabBtn {
+    flex: 1;
+    border: none;
+    background: #2d303a;
+    color: #fff;
+    font-weight: bold;
+  }
+
+  .tabBtn.active {
+    background: #4a5060;
+  }
+
+  #menuContent {
+    height: calc(100% - 52px);
+    overflow-y: auto;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+
+  .inventory-row, .equip-row {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .small-btn {
+    border: none;
+    background: #555;
+    color: #fff;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .menu-section-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
+  .subtle {
+    color: #b9c0cf;
+    font-size: 13px;
+  }
 </style>
 </head>
-
 <body>
-
 <canvas id="game"></canvas>
+
+<div id="zoneLabel">Temporal Rift</div>
+
+<div id="statusHud">
+  <div>HP <span id="hpText">100 / 100</span></div>
+  <div class="bar-wrap"><div id="hpBar" class="hp-bar"></div></div>
+
+  <div>SP <span id="spText">100 / 100</span></div>
+  <div class="bar-wrap"><div id="spBar" class="sp-bar"></div></div>
+
+  <div id="miniStats" class="subtle">ATK 1000 | DEF 1000 | Crit 0% | Crit Force 170%</div>
+</div>
+
 <div id="infoBar"></div>
-<div id="attackButton">ATK</div>
+
+<button id="menuBtn" class="ui-btn">Menu</button>
+
+<button id="attackBtn" class="ui-btn">Attack</button>
+<button id="skill1" class="ui-btn skill-btn"></button>
+<button id="skill2" class="ui-btn skill-btn"></button>
+<button id="skill3" class="ui-btn skill-btn"></button>
+<button id="ougie1" class="ui-btn ougie-btn"></button>
+<button id="ougie2" class="ui-btn ougie-btn"></button>
+<button id="itemUseBtn" class="ui-btn">Use Item</button>
+
+<div id="itemBar"></div>
+
+<div id="touchPad">
+  <button id="upBtn" class="move-btn">▲</button>
+  <button id="leftBtn" class="move-btn">◀</button>
+  <button id="rightBtn" class="move-btn">▶</button>
+  <button id="downBtn" class="move-btn">▼</button>
+</div>
+
+<div id="menuPanel">
+  <div id="menuHeader">
+    <button class="tabBtn active" data-tab="player">Player</button>
+    <button class="tabBtn" data-tab="inventory">Inventory</button>
+  </div>
+  <div id="menuContent"></div>
+</div>
 
 <script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-const canvas = document.getElementById("game")
-const ctx = canvas.getContext("2d")
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
+const infoBar = document.getElementById("infoBar");
+const menuBtn = document.getElementById("menuBtn");
+const menuPanel = document.getElementById("menuPanel");
+const menuContent = document.getElementById("menuContent");
+const tabButtons = document.querySelectorAll(".tabBtn");
+const zoneLabel = document.getElementById("zoneLabel");
 
-let infoBar = document.getElementById("infoBar")
+const hpText = document.getElementById("hpText");
+const spText = document.getElementById("spText");
+const hpBar = document.getElementById("hpBar");
+const spBar = document.getElementById("spBar");
+const miniStats = document.getElementById("miniStats");
 
-function log(text){
-infoBar.innerHTML = text + "<br>" + infoBar.innerHTML
+const skillButtons = [
+  document.getElementById("skill1"),
+  document.getElementById("skill2"),
+  document.getElementById("skill3"),
+];
+const ougieButtons = [
+  document.getElementById("ougie1"),
+  document.getElementById("ougie2"),
+];
+
+const itemBarEl = document.getElementById("itemBar");
+const attackBtn = document.getElementById("attackBtn");
+const itemUseBtn = document.getElementById("itemUseBtn");
+
+const movementState = { up:false, down:false, left:false, right:false };
+
+const GAME_VERSION = "0.2";
+let activeTab = "player";
+let messageQueue = [];
+
+function logMessage(text) {
+  const stamp = new Date().toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"});
+  messageQueue.unshift("[" + stamp + "] " + text);
+  messageQueue = messageQueue.slice(0, 6);
+  infoBar.innerHTML = messageQueue.join("<br>");
 }
 
-class Player{
-constructor(){
-this.x=200
-this.y=200
-this.hp=100
-this.atk=10
-this.speed=3
-this.inventory={}
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
 }
 
-move(dx,dy){
-this.x+=dx*this.speed
-this.y+=dy*this.speed
+const ItemDatabase = {
+  "Potion": { type: "consumable", healHP: 50 },
+  "Mega Potion": { type: "consumable", healHP: 120 },
+  "Magatama of Memories": { type: "magatama" },
+  "Unidentified Weapon ??? - Yamanaka": { type: "weapon_material" },
+  "Skill Card": { type: "skill_card" },
+  "Painful Choice Papers": { type: "material" },
+  "Photoshopped Photos": { type: "material" },
+  "Truthseeker Orbs": { type: "material" },
+  "Bright Shadows": { type: "material" },
+  "Familiar Sword": { type: "weapon", weaponClass: "Sword", attack: 1000, skills:["","",""], ougies:["",""] },
+  "Familiar Bow": { type: "weapon", weaponClass: "Bow", attack: 1000, skills:["","",""], ougies:["",""] },
+  "Familiar Twin Swords": { type: "weapon", weaponClass: "Twin Sword", attack: 1000, skills:["","",""], ougies:["",""] }
+};
+
+class InventorySystem {
+  constructor() {
+    this.items = {};
+    this.maxStack = 9999;
+  }
+
+  addItem(name, qty = 1) {
+    const current = this.items[name] || 0;
+    this.items[name] = clamp(current + qty, 0, this.maxStack);
+    logMessage("Obtained " + name + (qty > 1 ? " x" + qty : ""));
+    saveGame();
+    renderMenu();
+    renderItemBar();
+  }
+
+  removeItem(name, qty = 1) {
+    if (!this.items[name]) return false;
+    this.items[name] -= qty;
+    if (this.items[name] <= 0) delete this.items[name];
+    saveGame();
+    renderMenu();
+    renderItemBar();
+    return true;
+  }
+
+  getSortedItems() {
+    return Object.keys(this.items).sort((a, b) => a.localeCompare(b));
+  }
 }
 
-attack(enemy){
-let damage = this.atk - enemy.def
+class EquipmentSystem {
+  constructor() {
+    this.weapons = [null, null, null, null];
+    this.accessories = [null, null];
+    this.magatama = [null, null, null, null];
+    this.activeWeaponIndex = 0;
+  }
 
-if(damage < 1) damage = 1
+  getActiveWeapon() {
+    return this.weapons[this.activeWeaponIndex];
+  }
 
-enemy.hp -= damage
+  equipWeapon(itemName) {
+    const emptyIndex = this.weapons.findIndex(w => w === null);
+    if (emptyIndex === -1) {
+      logMessage("No empty weapon slot.");
+      return false;
+    }
 
-log("Hit enemy for "+damage)
+    const itemData = ItemDatabase[itemName];
+    if (!itemData || itemData.type !== "weapon") return false;
 
-if(enemy.hp <= 0){
-enemy.die()
-}
-}
-}
+    this.weapons[emptyIndex] = JSON.parse(JSON.stringify({
+      name: itemName,
+      weaponClass: itemData.weaponClass,
+      attack: itemData.attack,
+      skills: itemData.skills || ["", "", ""],
+      ougies: itemData.ougies || ["", ""]
+    }));
 
-class Enemy{
-constructor(x,y){
-this.x=x
-this.y=y
-this.hp=30
-this.atk=5
-this.def=2
-}
+    inventory.removeItem(itemName, 1);
+    logMessage(itemName + " equipped.");
+    saveGame();
+    renderMenu();
+    updateSkillButtons();
+    updateHud();
+    return true;
+  }
 
-update(){
-let dx = player.x - this.x
-let dy = player.y - this.y
+  getTotalAttack() {
+    const active = this.getActiveWeapon();
+    return active ? active.attack : 0;
+  }
 
-let dist = Math.sqrt(dx*dx + dy*dy)
-
-if(dist < 200){
-this.x += dx/dist
-this.y += dy/dist
-}
-
-if(dist < 40){
-player.hp -= 0.02
-}
-}
-
-die(){
-log("Enemy defeated")
-
-dropItem()
-
-enemies.splice(enemies.indexOf(this),1)
-}
-}
-
-let player = new Player()
-
-let enemies = [
-new Enemy(500,300),
-new Enemy(700,400),
-new Enemy(600,200)
-]
-
-function dropItem(){
-
-let items = ["Potion","Magatama","Weapon","SkillCard"]
-
-let item = items[Math.floor(Math.random()*items.length)]
-
-player.inventory[item] = (player.inventory[item]||0)+1
-
-log("Obtained "+item)
+  getTotalDefense() {
+    return 1000;
+  }
 }
 
-let keys={}
+class Player {
+  constructor() {
+    this.name = "Player";
+    this.bodyType = "Young Girl";
+    this.x = 180;
+    this.y = 240;
+    this.width = 34;
+    this.height = 34;
 
-document.addEventListener("keydown",e=>{
-keys[e.key]=true
-})
+    this.maxHP = 100;
+    this.hp = 100;
+    this.maxSP = 100;
+    this.sp = 100;
 
-document.addEventListener("keyup",e=>{
-keys[e.key]=false
-})
+    this.attackBase = 1000;
+    this.defenseBase = 1000;
+    this.critRate = 0;
+    this.critForce = 170;
+    this.moveSpeed = 2.8;
 
-document.getElementById("attackButton").onclick=()=>{
+    this.quickItems = [null, null, null, null, null];
+    this.selectedQuickItem = 0;
 
-enemies.forEach(e=>{
+    this.livesInDungeon = 4;
+    this.zone = "Temporal Rift";
+  }
 
-let dx = player.x-e.x
-let dy = player.y-e.y
+  move(dx, dy) {
+    this.x += dx * this.moveSpeed;
+    this.y += dy * this.moveSpeed;
+    this.x = clamp(this.x, 0, canvas.width - this.width);
+    this.y = clamp(this.y, 0, canvas.height - this.height);
+  }
 
-let dist = Math.sqrt(dx*dx+dy*dy)
+  getAttack() {
+    return this.attackBase + equipment.getTotalAttack();
+  }
 
-if(dist<60){
-player.attack(e)
+  getDefense() {
+    return this.defenseBase + equipment.getTotalDefense();
+  }
+
+  takeDamage(amount) {
+    this.hp -= amount;
+    if (this.hp < 0) this.hp = 0;
+    updateHud();
+    if (this.hp <= 0) this.onDeath();
+  }
+
+  heal(amount) {
+    this.hp = clamp(this.hp + amount, 0, this.maxHP);
+    updateHud();
+  }
+
+  onDeath() {
+    logMessage("You died. Dungeon life consumed.");
+    this.livesInDungeon -= 1;
+
+    if (this.livesInDungeon < 0) {
+      this.livesInDungeon = 4;
+      logMessage("All dungeon lives used. Returning outside.");
+    }
+
+    this.hp = this.maxHP;
+    this.sp = this.maxSP;
+    this.x = 180;
+    this.y = 240;
+    saveGame();
+    updateHud();
+  }
+
+  useSelectedQuickItem() {
+    const itemName = this.quickItems[this.selectedQuickItem];
+    if (!itemName) {
+      logMessage("No item selected.");
+      return;
+    }
+
+    if (!inventory.items[itemName]) {
+      logMessage(itemName + " is out.");
+      this.quickItems[this.selectedQuickItem] = null;
+      renderItemBar();
+      saveGame();
+      return;
+    }
+
+    const itemData = ItemDatabase[itemName];
+    if (!itemData) return;
+
+    if (itemData.type === "consumable") {
+      if (itemData.healHP) {
+        this.heal(itemData.healHP);
+        logMessage("Used " + itemName + ". HP restored.");
+      }
+      inventory.removeItem(itemName, 1);
+    } else {
+      logMessage(itemName + " cannot be used from quick bar yet.");
+    }
+
+    renderItemBar();
+    saveGame();
+  }
 }
 
-})
+class Enemy {
+  constructor(type, x, y, color) {
+    this.type = type;
+    this.x = x;
+    this.y = y;
+    this.width = 28;
+    this.height = 28;
+    this.hp = 5;
+    this.maxHP = 5;
+    this.attack = 3;
+    this.def = 0;
+    this.detectRange = 180;
+    this.attackRange = 38;
+    this.cooldown = 0;
+    this.color = color;
+    this.dead = false;
+  }
 
+  update() {
+    if (this.dead) return;
+
+    const dx = player.x - this.x;
+    const dy = player.y - this.y;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist <= this.detectRange) {
+      if (dist > this.attackRange) {
+        const dirX = dx / (dist || 1);
+        const dirY = dy / (dist || 1);
+        this.x += dirX * 1.1;
+        this.y += dirY * 1.1;
+      } else if (this.cooldown <= 0) {
+        player.takeDamage(2);
+        logMessage(this.type + " hit you.");
+        this.cooldown = 50;
+      }
+    }
+
+    if (this.cooldown > 0) this.cooldown--;
+  }
+
+  takeHit(damage) {
+    if (this.dead) return;
+    this.hp -= damage;
+    if (this.hp <= 0) this.die();
+  }
+
+  die() {
+    this.dead = true;
+    logMessage(this.type + " defeated.");
+    dropLoot(this.type);
+    enemies = enemies.filter(e => e !== this);
+  }
+
+  draw() {
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+
+    ctx.fillStyle = "#000";
+    ctx.fillRect(this.x, this.y - 8, this.width, 4);
+    ctx.fillStyle = "#ff5252";
+    ctx.fillRect(this.x, this.y - 8, this.width * (this.hp / this.maxHP), 4);
+  }
 }
 
-function update(){
+const inventory = new InventorySystem();
+const equipment = new EquipmentSystem();
+const player = new Player();
 
-if(keys["w"]) player.move(0,-1)
-if(keys["s"]) player.move(0,1)
-if(keys["a"]) player.move(-1,0)
-if(keys["d"]) player.move(1,0)
+let enemies = [];
+let currentZone = "Temporal Rift";
 
-enemies.forEach(e=>e.update())
+function seedInitialGameData() {
+  if (Object.keys(inventory.items).length === 0) {
+    inventory.addItem("Potion", 5);
+    inventory.addItem("Mega Potion", 2);
+    inventory.addItem("Familiar Sword", 1);
+    inventory.addItem("Skill Card", 1);
+    inventory.addItem("Unidentified Weapon ??? - Yamanaka", 1);
+  }
 
-if(player.hp<=0){
-log("You died. Dungeon reset.")
-player.hp=100
-player.x=200
-player.y=200
+  if (!equipment.weapons[0] && inventory.items["Familiar Sword"]) {
+    equipment.equipWeapon("Familiar Sword");
+  }
+
+  if (!player.quickItems[0] && inventory.items["Potion"]) {
+    player.quickItems[0] = "Potion";
+  }
+
+  currentZone = "Dimension of Memories";
+  zoneLabel.textContent = currentZone;
+  player.zone = currentZone;
+
+  spawnDimensionOfMemories();
+  updateSkillButtons();
+  updateHud();
+  renderItemBar();
 }
 
-saveGame()
+function spawnDimensionOfMemories() {
+  enemies = [
+    new Enemy("Unnamed Mob", 420, 140, "#7f1d1d"),
+    new Enemy("Unnamed Mob", 560, 180, "#8b5cf6"),
+    new Enemy("Unnamed Mob", 660, 240, "#475569"),
+    new Enemy("Unnamed Mob", 500, 310, "#1d4ed8"),
+    new Enemy("Unnamed Mob", 350, 360, "#6b7280"),
+    new Enemy("Unnamed Mob", 620, 110, "#14532d")
+  ];
 }
 
-function draw(){
+function updateHud() {
+  hpText.textContent = Math.floor(player.hp) + " / " + player.maxHP;
+  spText.textContent = Math.floor(player.sp) + " / " + player.maxSP;
 
-ctx.clearRect(0,0,canvas.width,canvas.height)
+  hpBar.style.width = (player.hp / player.maxHP * 100) + "%";
+  spBar.style.width = (player.sp / player.maxSP * 100) + "%";
 
-ctx.fillStyle="blue"
-ctx.fillRect(player.x,player.y,30,30)
-
-ctx.fillStyle="red"
-enemies.forEach(e=>{
-ctx.fillRect(e.x,e.y,30,30)
-})
-
-ctx.fillStyle="white"
-ctx.fillText("HP: "+Math.floor(player.hp),20,20)
-
+  miniStats.textContent =
+    "ATK " + player.getAttack() +
+    " | DEF " + player.getDefense() +
+    " | Crit " + player.critRate + "%" +
+    " | Crit Force " + player.critForce + "%";
 }
 
-function saveGame(){
-localStorage.setItem("onigiri_save",JSON.stringify(player.inventory))
+function updateSkillButtons() {
+  const active = equipment.getActiveWeapon();
+
+  if (!active) {
+    attackBtn.textContent = "Attack";
+    skillButtons.forEach(btn => {
+      btn.textContent = "";
+      btn.style.background = "#666";
+    });
+    ougieButtons.forEach(btn => {
+      btn.textContent = "";
+      btn.style.background = "#666";
+    });
+    return;
+  }
+
+  attackBtn.textContent = active.weaponClass + " ATK";
+
+  active.skills.forEach((skill, i) => {
+    skillButtons[i].textContent = skill || "";
+    skillButtons[i].style.background = skill ? "#d4a017" : "#666";
+  });
+
+  active.ougies.forEach((ougie, i) => {
+    ougieButtons[i].textContent = ougie || "";
+    ougieButtons[i].style.background = ougie ? "#d96a1d" : "#666";
+  });
 }
 
-function loadGame(){
+function renderItemBar() {
+  itemBarEl.innerHTML = "";
 
-let data = localStorage.getItem("onigiri_save")
-
-if(data){
-player.inventory = JSON.parse(data)
-log("Save loaded")
+  for (let i = 0; i < 5; i++) {
+    const slot = document.createElement("div");
+    slot.className = "item-slot" + (player.selectedQuickItem === i ? " selected" : "");
+    const itemName = player.quickItems[i];
+    slot.textContent = itemName ? itemName.replace(" Potion", "\nPot.") : "Empty";
+    slot.onclick = () => {
+      player.selectedQuickItem = i;
+      renderItemBar();
+      saveGame();
+    };
+    itemBarEl.appendChild(slot);
+  }
 }
 
+function renderMenu() {
+  if (menuPanel.style.display === "none") return;
+
+  if (activeTab === "player") {
+    renderPlayerMenu();
+  } else if (activeTab === "inventory") {
+    renderInventoryMenu();
+  }
 }
 
-function loop(){
+function renderPlayerMenu() {
+  const activeWeapon = equipment.getActiveWeapon();
 
-update()
-draw()
+  menuContent.innerHTML = `
+    <div class="menu-section-title">Player Panel</div>
+    <div class="subtle" style="margin-bottom:10px;">
+      Name: ${player.name}<br>
+      Body Type: ${player.bodyType}<br>
+      Zone: ${player.zone}<br>
+      Dungeon Lives: ${player.livesInDungeon}
+    </div>
 
-requestAnimationFrame(loop)
+    <div class="menu-section-title">Equipment</div>
+    ${equipment.weapons.map((weapon, i) => `
+      <div class="equip-row">
+        <div>
+          <strong>Weapon Slot ${i + 1}</strong><br>
+          <span class="subtle">${weapon ? weapon.name + " (" + weapon.weaponClass + ")" : "Empty"}</span>
+        </div>
+        <button class="small-btn" onclick="setActiveWeapon(${i})">Set Active</button>
+      </div>
+    `).join("")}
+
+    ${equipment.magatama.map((mag, i) => `
+      <div class="equip-row">
+        <div>
+          <strong>Magatama Slot ${i + 1}</strong><br>
+          <span class="subtle">${mag ? mag : "Empty"}</span>
+        </div>
+      </div>
+    `).join("")}
+
+    <div class="menu-section-title">Live Status</div>
+    <div class="subtle">
+      HP: ${player.maxHP}<br>
+      Attack: ${player.getAttack()}<br>
+      Defense: ${player.getDefense()}<br>
+      Critical: ${player.critRate}%<br>
+      Critical Force: ${player.critForce}%<br>
+      Active Weapon: ${activeWeapon ? activeWeapon.name : "None"}
+    </div>
+  `;
 }
 
-loadGame()
-loop()
+function renderInventoryMenu() {
+  const items = inventory.getSortedItems();
 
+  menuContent.innerHTML = `
+    <div class="menu-section-title">Inventory</div>
+    <div class="subtle" style="margin-bottom:10px;">
+      Shared storage foundation active. Stack limit per item: 9999.
+    </div>
+    ${items.length ? items.map(itemName => `
+      <div class="inventory-row">
+        <div>
+          <strong>${itemName}</strong><br>
+          <span class="subtle">x${inventory.items[itemName]} | ${ItemDatabase[itemName]?.type || "misc"}</span>
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
+          <button class="small-btn" onclick="addToQuickBar('${escapeQuotes(itemName)}')">Quick Bar</button>
+          <button class="small-btn" onclick="tryEquipItem('${escapeQuotes(itemName)}')">Equip</button>
+          <button class="small-btn" onclick="useInventoryItem('${escapeQuotes(itemName)}')">Use</button>
+        </div>
+      </div>
+    `).join("") : `<div class="subtle">Inventory is empty.</div>`}
+  `;
+}
+
+function escapeQuotes(str) {
+  return str.replaceAll("'", "\\'");
+}
+
+function setActiveWeapon(index) {
+  equipment.activeWeaponIndex = index;
+  updateSkillButtons();
+  renderMenu();
+  updateHud();
+  logMessage("Active weapon changed.");
+  saveGame();
+}
+
+function addToQuickBar(itemName) {
+  const itemData = ItemDatabase[itemName];
+  if (!itemData || itemData.type !== "consumable") {
+    logMessage("Only recovery/boost items can be placed there.");
+    return;
+  }
+
+  const empty = player.quickItems.findIndex(slot => slot === null);
+  if (empty === -1) {
+    player.quickItems[player.selectedQuickItem] = itemName;
+  } else {
+    player.quickItems[empty] = itemName;
+  }
+
+  logMessage(itemName + " added to item bar.");
+  renderItemBar();
+  saveGame();
+}
+
+function tryEquipItem(itemName) {
+  const itemData = ItemDatabase[itemName];
+  if (!itemData) return;
+
+  if (itemData.type === "weapon") {
+    equipment.equipWeapon(itemName);
+  } else {
+    logMessage("That item cannot be equipped yet.");
+  }
+}
+
+function useInventoryItem(itemName) {
+  const itemData = ItemDatabase[itemName];
+  if (!itemData) return;
+
+  if (itemData.type === "consumable") {
+    if (itemData.healHP) {
+      player.heal(itemData.healHP);
+      inventory.removeItem(itemName, 1);
+      logMessage("Used " + itemName + ".");
+    }
+  } else if (itemData.type === "skill_card") {
+    logMessage('Now applying "Skill Card" system later.');
+  } else {
+    logMessage(itemName + " cannot be directly used yet.");
+  }
+
+  saveGame();
+  renderMenu();
+}
+
+function performBasicAttack() {
+  const activeWeapon = equipment.getActiveWeapon();
+  if (!activeWeapon) {
+    logMessage("No weapon equipped.");
+    return;
+  }
+
+  let hitSomething = false;
+
+  enemies.forEach(enemy => {
+    const dx = (enemy.x + enemy.width / 2) - (player.x + player.width / 2);
+    const dy = (enemy.y + enemy.height / 2) - (player.y + player.height / 2);
+    const dist = Math.hypot(dx, dy);
+
+    if (dist <= 72) {
+      const damage = Math.max(1, Math.floor((player.getAttack() / 1000)));
+      enemy.takeHit(damage);
+      hitSomething = true;
+      logMessage(activeWeapon.weaponClass + " basic attack hit for " + damage + ".");
+    }
+  });
+
+  if (!hitSomething) {
+    logMessage("Attack missed.");
+  }
+
+  saveGame();
+}
+
+function dropLoot(enemyType) {
+  const pool = [
+    "Potion",
+    "Painful Choice Papers",
+    "Photoshopped Photos",
+    "Skill Card",
+    "Unidentified Weapon ??? - Yamanaka"
+  ];
+
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  inventory.addItem(item, 1);
+}
+
+function saveGame() {
+  const saveData = {
+    version: GAME_VERSION,
+    player: {
+      name: player.name,
+      bodyType: player.bodyType,
+      x: player.x,
+      y: player.y,
+      hp: player.hp,
+      sp: player.sp,
+      maxHP: player.maxHP,
+      maxSP: player.maxSP,
+      quickItems: player.quickItems,
+      selectedQuickItem: player.selectedQuickItem,
+      zone: player.zone,
+      livesInDungeon: player.livesInDungeon
+    },
+    inventory: inventory.items,
+    equipment: equipment
+  };
+
+  localStorage.setItem("onigiri2_save", JSON.stringify(saveData));
+}
+
+function loadGame() {
+  const raw = localStorage.getItem("onigiri2_save");
+  if (!raw) return false;
+
+  try {
+    const save = JSON.parse(raw);
+
+    if (save.player) {
+      Object.assign(player, save.player);
+    }
+
+    if (save.inventory) {
+      inventory.items = save.inventory;
+    }
+
+    if (save.equipment) {
+      equipment.weapons = save.equipment.weapons || [null, null, null, null];
+      equipment.accessories = save.equipment.accessories || [null, null];
+      equipment.magatama = save.equipment.magatama || [null, null, null, null];
+      equipment.activeWeaponIndex = save.equipment.activeWeaponIndex || 0;
+    }
+
+    currentZone = player.zone || "Temporal Rift";
+    zoneLabel.textContent = currentZone;
+    logMessage("Save loaded.");
+    return true;
+  } catch (e) {
+    logMessage("Save load failed.");
+    return false;
+  }
+}
+
+function drawZoneBackground() {
+  if (currentZone === "Dimension of Memories") {
+    ctx.fillStyle = "#5f6b5d";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "rgba(80,80,80,0.35)";
+    for (let i = 0; i < 12; i++) {
+      ctx.fillRect(80 + i * 120, 60 + (i % 4) * 100, 16, 70);
+    }
+
+    ctx.fillStyle = "#2c3a2f";
+    ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+  } else {
+    ctx.fillStyle = "#222";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+function drawPlayer() {
+  ctx.fillStyle = "#4da3ff";
+  ctx.fillRect(player.x, player.y, player.width, player.height);
+
+  ctx.fillStyle = "#fff";
+  ctx.font = "12px Arial";
+  ctx.fillText(player.name, player.x - 2, player.y - 10);
+}
+
+function update() {
+  if (menuPanel.style.display !== "none") return;
+
+  let dx = 0;
+  let dy = 0;
+  if (movementState.up) dy -= 1;
+  if (movementState.down) dy += 1;
+  if (movementState.left) dx -= 1;
+  if (movementState.right) dx += 1;
+
+  if (dx !== 0 || dy !== 0) {
+    const len = Math.hypot(dx, dy) || 1;
+    player.move(dx / len, dy / len);
+  }
+
+  enemies.forEach(enemy => enemy.update());
+  updateHud();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawZoneBackground();
+  drawPlayer();
+  enemies.forEach(enemy => enemy.draw());
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+menuBtn.onclick = () => {
+  menuPanel.style.display = menuPanel.style.display === "none" ? "block" : "none";
+  renderMenu();
+};
+
+tabButtons.forEach(btn => {
+  btn.onclick = () => {
+    tabButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeTab = btn.dataset.tab;
+    renderMenu();
+  };
+});
+
+attackBtn.onclick = performBasicAttack;
+itemUseBtn.onclick = () => player.useSelectedQuickItem();
+
+skillButtons.forEach(btn => {
+  btn.onclick = () => logMessage("Skill system expanding next.");
+});
+
+ougieButtons.forEach(btn => {
+  btn.onclick = () => logMessage("Ougie system expanding next.");
+});
+
+function bindHoldButton(el, key) {
+  const on = (e) => { e.preventDefault(); movementState[key] = true; };
+  const off = (e) => { e.preventDefault(); movementState[key] = false; };
+
+  el.addEventListener("touchstart", on, { passive: false });
+  el.addEventListener("touchend", off, { passive: false });
+  el.addEventListener("touchcancel", off, { passive: false });
+
+  el.addEventListener("mousedown", on);
+  el.addEventListener("mouseup", off);
+  el.addEventListener("mouseleave", off);
+}
+
+bindHoldButton(document.getElementById("upBtn"), "up");
+bindHoldButton(document.getElementById("downBtn"), "down");
+bindHoldButton(document.getElementById("leftBtn"), "left");
+bindHoldButton(document.getElementById("rightBtn"), "right");
+
+if (!loadGame()) {
+  seedInitialGameData();
+} else {
+  if (currentZone === "Dimension of Memories") {
+    spawnDimensionOfMemories();
+  } else {
+    spawnDimensionOfMemories();
+    currentZone = "Dimension of Memories";
+    zoneLabel.textContent = currentZone;
+  }
+  updateSkillButtons();
+  updateHud();
+  renderItemBar();
+}
+
+logMessage("Onigiri 2 v0.2 loaded.");
+loop();
 </script>
-
 </body>
 </html>
