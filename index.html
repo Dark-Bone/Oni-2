@@ -3,16 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Onigiri 2 v0.31</title>
+<title>Onigiri 2 v0.32</title>
 <style>
   :root{
     --shell-pink-1:#f7dce7;
     --shell-pink-2:#efc8d7;
-    --shell-pink-3:#d7a9bb;
     --shell-line:#c990a9;
     --screen-border:#e6bfd1;
 
-    --hud-bg:rgba(12,12,16,0.45);
+    --hud-bg:rgba(12,12,16,0.48);
     --hp:#d4587a;
     --sp:#6eaef5;
 
@@ -20,6 +19,7 @@
     --skill:#f2d257;
     --ougie:#f3a44e;
     --item:#8fd86b;
+    --talk:#64a8ff;
   }
 
   *{
@@ -188,41 +188,22 @@
     line-height:1.25;
   }
 
-  .shoulder{
-    position:absolute;
-    top:calc(53% + 52px);
-    width:70px;
-    height:24px;
-    border-radius:12px;
-    background:linear-gradient(180deg,#e5c1d0,#cb9fb2);
-    border:1px solid var(--shell-line);
-    color:#734558;
-    font-weight:bold;
-    font-size:12px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow:0 4px 8px rgba(0,0,0,0.12);
-  }
-
-  #btnL{ left:30px; }
-  #btnR{ right:30px; }
-
   #controlsArea{
     position:absolute;
     left:0;
     right:0;
     bottom:0;
-    top:calc(53% + 68px);
+    top:calc(53% + 54px);
   }
 
   /* JOYSTICK */
   #joystickArea{
     position:absolute;
-    left:22px;
-    bottom:62px;
+    left:28px;
+    bottom:110px; /* moved up */
     width:128px;
     height:128px;
+    touch-action:none;
   }
 
   #joyBase{
@@ -257,18 +238,18 @@
     box-shadow:0 3px 8px rgba(0,0,0,0.14);
   }
 
+  /* RIGHT CONTROLS */
   #rightCluster{
     position:absolute;
     right:18px;
-    bottom:52px;
-    width:160px;
-    height:216px;
+    bottom:82px;
+    width:138px;
+    height:280px;
   }
 
   .shell-btn{
     position:absolute;
     border:none;
-    border-radius:999px;
     color:#fff;
     font-weight:bold;
     box-shadow:
@@ -282,42 +263,58 @@
   }
 
   #attackBtn{
-    right:18px;
+    left:50%;
+    transform:translateX(-50%);
     top:0;
-    width:66px;
-    height:66px;
+    width:68px;
+    height:68px;
+    border-radius:999px;
     background:radial-gradient(circle at 30% 30%, #ff9aa1, var(--attack));
     font-size:15px;
   }
 
+  .stack-btn{
+    left:50%;
+    transform:translateX(-50%);
+    width:84px;
+    height:34px;
+    border-radius:999px;
+    font-size:13px;
+  }
+
   .skill-btn{
-    width:48px;
-    height:48px;
     background:radial-gradient(circle at 30% 30%, #fff0a6, var(--skill));
     color:#6d5310;
-    font-size:12px;
   }
-
-  #skill1{ left:14px; top:34px; }
-  #skill2{ left:0; top:88px; }
-  #skill3{ left:18px; top:142px; }
 
   .ougie-btn{
-    width:50px;
-    height:50px;
     background:radial-gradient(circle at 30% 30%, #ffd09d, var(--ougie));
     color:#7b4311;
+  }
+
+  #skill1{ top:78px; }
+  #skill2{ top:116px; }
+  #skill3{ top:154px; }
+  #ougie1{ top:192px; }
+  #ougie2{ top:230px; }
+
+  #talkBtn{
+    right:-2px;
+    top:94px;
+    width:56px;
+    height:56px;
+    border-radius:999px;
+    background:radial-gradient(circle at 30% 30%, #b6d8ff, var(--talk));
+    color:#173b6c;
     font-size:12px;
   }
 
-  #ougie1{ right:64px; top:94px; }
-  #ougie2{ right:8px; top:136px; }
-
   #itemUseBtn{
-    right:0;
-    bottom:0;
-    width:56px;
-    height:56px;
+    right:-2px;
+    bottom:-2px;
+    width:58px;
+    height:58px;
+    border-radius:999px;
     background:radial-gradient(circle at 30% 30%, #c9f8b1, var(--item));
     color:#29551a;
     font-size:11px;
@@ -325,9 +322,9 @@
 
   #itemBarWrap{
     position:absolute;
-    left:164px;
-    right:92px;
-    bottom:76px;
+    left:168px;
+    right:84px;
+    bottom:86px;
     display:flex;
     justify-content:center;
     gap:5px;
@@ -359,8 +356,8 @@
     left:50%;
     bottom:24px;
     transform:translateX(-50%);
-    width:64px;
-    height:28px;
+    width:72px;
+    height:30px;
     border-radius:999px;
     border:none;
     background:linear-gradient(180deg,#f8eef2,#debfcd);
@@ -369,24 +366,8 @@
     font-size:11px;
     font-weight:bold;
     box-shadow:0 3px 6px rgba(0,0,0,0.1);
+    z-index:130; /* above menu */
   }
-
-  #startBtn,#selectBtn{
-    position:absolute;
-    bottom:27px;
-    width:52px;
-    height:22px;
-    border-radius:999px;
-    border:none;
-    background:linear-gradient(180deg,#f8eef2,#debfcd);
-    border:1px solid #b98ca0;
-    color:#734558;
-    font-size:10px;
-    font-weight:bold;
-  }
-
-  #selectBtn{ left:98px; }
-  #startBtn{ right:98px; }
 
   #menuPanel{
     position:absolute;
@@ -487,9 +468,6 @@
       </div>
     </div>
 
-    <div id="btnL" class="shoulder">L</div>
-    <div id="btnR" class="shoulder">R</div>
-
     <div id="controlsArea">
       <div id="joystickArea">
         <div id="joyBase"></div>
@@ -500,21 +478,19 @@
       <div id="rightCluster">
         <button id="attackBtn" class="shell-btn">ATK</button>
 
-        <button id="skill1" class="shell-btn skill-btn">S1</button>
-        <button id="skill2" class="shell-btn skill-btn">S2</button>
-        <button id="skill3" class="shell-btn skill-btn">S3</button>
+        <button id="skill1" class="shell-btn stack-btn skill-btn">S1</button>
+        <button id="skill2" class="shell-btn stack-btn skill-btn">S2</button>
+        <button id="skill3" class="shell-btn stack-btn skill-btn">S3</button>
 
-        <button id="ougie1" class="shell-btn ougie-btn">O1</button>
-        <button id="ougie2" class="shell-btn ougie-btn">O2</button>
+        <button id="ougie1" class="shell-btn stack-btn ougie-btn">O1</button>
+        <button id="ougie2" class="shell-btn stack-btn ougie-btn">O2</button>
 
+        <button id="talkBtn" class="shell-btn">TALK</button>
         <button id="itemUseBtn" class="shell-btn">ITEM</button>
       </div>
 
       <div id="itemBarWrap"></div>
-
-      <button id="selectBtn">SELECT</button>
       <button id="menuBtn">MENU</button>
-      <button id="startBtn">START</button>
     </div>
 
     <div id="menuPanel">
@@ -546,6 +522,7 @@ const menuContent = document.getElementById("menuContent");
 const tabButtons = document.querySelectorAll(".tabBtn");
 
 const attackBtn = document.getElementById("attackBtn");
+const talkBtn = document.getElementById("talkBtn");
 const itemUseBtn = document.getElementById("itemUseBtn");
 const itemBarWrap = document.getElementById("itemBarWrap");
 
@@ -569,13 +546,14 @@ function resizeCanvas(){
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-const GAME_VERSION = "0.31";
+const GAME_VERSION = "0.32";
 let activeTab = "player";
 let currentZone = "Temporal Rift";
 let messages = [];
 let zoneToastTimer = null;
 let enemies = [];
-let joystick = { active:false, dx:0, dy:0 };
+let joystick = { active:false, dx:0, dy:0, id:null };
+let introDone = false;
 
 function showZone(name){
   currentZone = name;
@@ -691,7 +669,7 @@ class Player{
     this.defenseBase = 1000;
     this.critRate = 0;
     this.critForce = 170;
-    this.moveSpeed = 1.7;
+    this.moveSpeed = 1.75;
     this.zone = "Temporal Rift";
     this.quickItems = [null,null,null,null,null];
     this.selectedQuickItem = 0;
@@ -769,7 +747,7 @@ class Enemy{
     this.maxHP = 5;
     this.color = color;
     this.state = "idle";
-    this.detectRange = 70;
+    this.detectRange = 72;
     this.attackRange = 18;
     this.cooldown = 0;
     this.wanderTimer = 0;
@@ -783,25 +761,27 @@ class Enemy{
 
     if(dist <= this.detectRange){
       this.state = "chase";
-    } else if(this.state === "chase" && dist > this.detectRange + 18){
+    } else if(this.state === "chase" && dist > this.detectRange + 22){
       this.state = "idle";
     }
 
     if(this.state === "idle"){
       this.wanderTimer--;
       if(this.wanderTimer <= 0){
-        this.wanderTimer = 45 + Math.floor(Math.random() * 60);
+        this.wanderTimer = 50 + Math.floor(Math.random() * 80);
         this.wanderAngle = Math.random() * Math.PI * 2;
       }
-      this.x += Math.cos(this.wanderAngle) * 0.18;
-      this.y += Math.sin(this.wanderAngle) * 0.18;
 
-      if(Math.hypot(this.x - this.spawnX, this.y - this.spawnY) > 18){
+      this.x += Math.cos(this.wanderAngle) * 0.16;
+      this.y += Math.sin(this.wanderAngle) * 0.16;
+
+      const away = Math.hypot(this.x - this.spawnX, this.y - this.spawnY);
+      if(away > 18){
         const rdx = this.spawnX - this.x;
         const rdy = this.spawnY - this.y;
         const rdist = Math.hypot(rdx, rdy) || 1;
-        this.x += (rdx / rdist) * 0.35;
-        this.y += (rdy / rdist) * 0.35;
+        this.x += (rdx / rdist) * 0.28;
+        this.y += (rdy / rdist) * 0.28;
       }
     }
 
@@ -809,8 +789,8 @@ class Enemy{
       if(dist > this.attackRange){
         const nx = dx / (dist || 1);
         const ny = dy / (dist || 1);
-        this.x += nx * 0.52;
-        this.y += ny * 0.52;
+        this.x += nx * 0.50;
+        this.y += ny * 0.50;
       } else if(this.cooldown <= 0){
         player.takeDamage(2);
         logMessage(this.type + " hit you.");
@@ -828,7 +808,7 @@ class Enemy{
 
   die(){
     logMessage(this.type + " defeated.");
-    dropLoot(this.type);
+    dropLoot();
     enemies = enemies.filter(e => e !== this);
   }
 
@@ -858,6 +838,11 @@ function seedInitialData(){
     inventory.addItem("Unidentified Weapon ??? - Yamanaka", 1);
   }
 
+  if(!equipment.weapons[0] && inventory.items["Familiar Sword"]){
+    equipment.equipWeapon("FamiliarSwordFix");
+  }
+
+  // fix for older typo/missing state
   if(!equipment.weapons[0] && inventory.items["Familiar Sword"]){
     equipment.equipWeapon("Familiar Sword");
   }
@@ -898,16 +883,13 @@ function updateHud(){
 }
 
 function updateButtons(){
-  const active = equipment.getActiveWeapon();
-
   skillButtons.forEach((btn, i) => {
     btn.textContent = "S" + (i + 1);
-    btn.style.opacity = active && active.skills[i] ? 1 : 0.78;
+    btn.style.opacity = 0.88;
   });
-
   ougieButtons.forEach((btn, i) => {
     btn.textContent = "O" + (i + 1);
-    btn.style.opacity = active && active.ougies[i] ? 1 : 0.78;
+    btn.style.opacity = 0.88;
   });
 }
 
@@ -1079,6 +1061,41 @@ function dropLoot(){
   inventory.addItem(item,1);
 }
 
+function talkToNearbyNPC(){
+  if(currentZone !== "Temporal Rift"){
+    logMessage("No one to talk to here.");
+    return;
+  }
+
+  const aoi = { x: canvas.width * 0.44 + 6, y: canvas.height * 0.51 + 9, name: "Kotonoha Aoi" };
+  const akane = { x: canvas.width * 0.52 + 6, y: canvas.height * 0.51 + 9, name: "Kotonoha Akane" };
+  const px = player.x + player.w/2;
+  const py = player.y + player.h/2;
+
+  const da = Math.hypot(px - aoi.x, py - aoi.y);
+  const dk = Math.hypot(px - akane.x, py - akane.y);
+
+  if(Math.min(da, dk) > 36){
+    logMessage("No NPC close enough.");
+    return;
+  }
+
+  if(!introDone){
+    logMessage('Aoi: "OMG bestie ur finally here!"');
+    logMessage('Akane: "Somethings happened to Onigashima..."');
+    logMessage('Aoi: "Go to Cave of Memories and fix your memory."');
+    introDone = true;
+    saveGame();
+    return;
+  }
+
+  if(da < dk){
+    logMessage('Aoi: "Storage and Identify systems coming next."');
+  } else {
+    logMessage('Akane: "Smithing system coming next, bestie."');
+  }
+}
+
 function saveGame(){
   const saveData = {
     version: GAME_VERSION,
@@ -1097,7 +1114,8 @@ function saveGame(){
       livesInDungeon: player.livesInDungeon
     },
     inventory: inventory.items,
-    equipment: equipment
+    equipment: equipment,
+    introDone
   };
   localStorage.setItem("onigiri2_save", JSON.stringify(saveData));
 }
@@ -1115,6 +1133,7 @@ function loadGame(){
       equipment.magatama = save.equipment.magatama || [null,null,null,null];
       equipment.activeWeaponIndex = save.equipment.activeWeaponIndex || 0;
     }
+    introDone = !!save.introDone;
     player.zone = save.player?.zone || "Temporal Rift";
     return true;
   }catch(e){
@@ -1152,12 +1171,15 @@ function drawTemporalRift(){
   ctx.arc(w*0.476 + 6, h*0.35, 10, 0, Math.PI * 2);
   ctx.fill();
 
+  // Aoi
   ctx.fillStyle = "#7fd1ff";
   ctx.fillRect(w*0.44, h*0.51, 12, 18);
 
+  // Akane
   ctx.fillStyle = "#ff88a8";
   ctx.fillRect(w*0.52, h*0.51, 12, 18);
 
+  // portal
   ctx.fillStyle = "rgba(74,168,255,0.85)";
   ctx.beginPath();
   ctx.arc(w*0.79, h*0.56, 18, 0, Math.PI * 2);
@@ -1258,19 +1280,19 @@ function resetJoystickVisual(){
   joyStick.style.top = "42px";
 }
 
-function updateJoystickFromEvent(clientX, clientY){
+function updateJoystick(clientX, clientY){
   const rect = joyArea.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
+
   let dx = clientX - cx;
   let dy = clientY - cy;
-
   const max = 34;
   const dist = Math.hypot(dx, dy);
 
   if(dist > max){
-    dx = dx / dist * max;
-    dy = dy / dist * max;
+    dx = (dx / dist) * max;
+    dy = (dy / dist) * max;
   }
 
   joyStick.style.left = (42 + dx) + "px";
@@ -1282,33 +1304,39 @@ function updateJoystickFromEvent(clientX, clientY){
 
 joyArea.addEventListener("touchstart", (e) => {
   e.preventDefault();
-  const t = e.touches[0];
+  const t = e.changedTouches[0];
   joystick.active = true;
-  updateJoystickFromEvent(t.clientX, t.clientY);
+  joystick.id = t.identifier;
+  updateJoystick(t.clientX, t.clientY);
 }, { passive:false });
 
-joyArea.addEventListener("touchmove", (e) => {
-  e.preventDefault();
+document.addEventListener("touchmove", (e) => {
   if(!joystick.active) return;
-  const t = e.touches[0];
-  updateJoystickFromEvent(t.clientX, t.clientY);
+  for(const t of e.changedTouches){
+    if(t.identifier === joystick.id){
+      e.preventDefault();
+      updateJoystick(t.clientX, t.clientY);
+      break;
+    }
+  }
 }, { passive:false });
 
-joyArea.addEventListener("touchend", (e) => {
-  e.preventDefault();
-  joystick.active = false;
-  joystick.dx = 0;
-  joystick.dy = 0;
-  resetJoystickVisual();
-}, { passive:false });
+function endJoystickTouch(e){
+  if(!joystick.active) return;
+  for(const t of e.changedTouches){
+    if(t.identifier === joystick.id){
+      joystick.active = false;
+      joystick.id = null;
+      joystick.dx = 0;
+      joystick.dy = 0;
+      resetJoystickVisual();
+      break;
+    }
+  }
+}
 
-joyArea.addEventListener("touchcancel", (e) => {
-  e.preventDefault();
-  joystick.active = false;
-  joystick.dx = 0;
-  joystick.dy = 0;
-  resetJoystickVisual();
-}, { passive:false });
+document.addEventListener("touchend", endJoystickTouch, { passive:false });
+document.addEventListener("touchcancel", endJoystickTouch, { passive:false });
 
 menuBtn.onclick = () => {
   menuPanel.style.display = menuPanel.style.display === "none" ? "block" : "none";
@@ -1325,6 +1353,7 @@ tabButtons.forEach(btn => {
 });
 
 attackBtn.onclick = performBasicAttack;
+talkBtn.onclick = talkToNearbyNPC;
 itemUseBtn.onclick = () => player.useSelectedItem();
 skillButtons.forEach(btn => btn.onclick = () => logMessage("Skill system later."));
 ougieButtons.forEach(btn => btn.onclick = () => logMessage("Ougie system later."));
@@ -1345,7 +1374,7 @@ if(!loadGame()){
   renderItemBar();
 }
 
-logMessage("Onigiri 2 v0.31 loaded.");
+logMessage("Onigiri 2 v0.32 loaded.");
 loop();
 </script>
 </body>
