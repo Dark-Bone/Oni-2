@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Onigiri 2 v0.32</title>
+<title>Onigiri 2 v0.33</title>
 <style>
   :root{
     --shell-pink-1:#f7dce7;
@@ -15,7 +15,7 @@
     --hp:#d4587a;
     --sp:#6eaef5;
 
-    --attack:#f06f77;
+    --attack:#c8a07d;
     --skill:#f2d257;
     --ougie:#f3a44e;
     --item:#8fd86b;
@@ -188,6 +188,45 @@
     line-height:1.25;
   }
 
+  /* screen item display UI */
+  #itemDisplayUI{
+    position:absolute;
+    right:6px;
+    bottom:6px;
+    width:116px;
+    display:flex;
+    justify-content:flex-end;
+    gap:4px;
+  }
+
+  .item-display-slot{
+    width:32px;
+    height:32px;
+    border-radius:8px;
+    background:rgba(18,18,24,0.52);
+    border:1px solid rgba(255,255,255,0.16);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .item-display-slot.selected{
+    outline:2px solid rgba(255,255,255,0.7);
+  }
+
+  .item-count{
+    position:absolute;
+    right:2px;
+    bottom:1px;
+    font-size:7px;
+    color:#fff;
+    background:rgba(0,0,0,0.45);
+    padding:0 2px;
+    border-radius:4px;
+  }
+
   #controlsArea{
     position:absolute;
     left:0;
@@ -196,11 +235,11 @@
     top:calc(53% + 54px);
   }
 
-  /* JOYSTICK */
+  /* joystick */
   #joystickArea{
     position:absolute;
     left:28px;
-    bottom:110px; /* moved up */
+    bottom:110px;
     width:128px;
     height:128px;
     touch-action:none;
@@ -238,13 +277,45 @@
     box-shadow:0 3px 8px rgba(0,0,0,0.14);
   }
 
-  /* RIGHT CONTROLS */
+  /* item control buttons above joystick */
+  #itemControlRow{
+    position:absolute;
+    left:20px;
+    bottom:248px;
+    width:146px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  .item-control-btn{
+    border:none;
+    border-radius:999px;
+    height:34px;
+    color:#734558;
+    font-weight:bold;
+    background:linear-gradient(180deg,#f8eef2,#debfcd);
+    border:1px solid #b98ca0;
+    box-shadow:0 3px 6px rgba(0,0,0,0.1);
+  }
+
+  #itemLeftBtn, #itemRightBtn{
+    width:40px;
+    font-size:18px;
+  }
+
+  #itemCenterBtn{
+    width:54px;
+    font-size:11px;
+  }
+
+  /* right cluster */
   #rightCluster{
     position:absolute;
     right:18px;
-    bottom:82px;
-    width:138px;
-    height:280px;
+    bottom:88px;
+    width:132px;
+    height:278px;
   }
 
   .shell-btn{
@@ -255,31 +326,24 @@
     box-shadow:
       0 5px 9px rgba(0,0,0,0.16),
       inset 0 2px 0 rgba(255,255,255,0.28);
-    transform:translateZ(0);
   }
 
   .shell-btn:active{
     transform:scale(0.97);
   }
 
-  #attackBtn{
-    left:50%;
-    transform:translateX(-50%);
-    top:0;
-    width:68px;
-    height:68px;
-    border-radius:999px;
-    background:radial-gradient(circle at 30% 30%, #ff9aa1, var(--attack));
-    font-size:15px;
-  }
-
   .stack-btn{
-    left:50%;
-    transform:translateX(-50%);
-    width:84px;
+    left:38px;
+    width:76px;
     height:34px;
     border-radius:999px;
     font-size:13px;
+  }
+
+  #attackBtn{
+    top:0;
+    background:radial-gradient(circle at 30% 30%, #e2c5a8, var(--attack));
+    color:#5d3e24;
   }
 
   .skill-btn{
@@ -292,63 +356,32 @@
     color:#7b4311;
   }
 
-  #skill1{ top:78px; }
-  #skill2{ top:116px; }
-  #skill3{ top:154px; }
-  #ougie1{ top:192px; }
-  #ougie2{ top:230px; }
+  #skill1{ top:40px; }
+  #skill2{ top:78px; }
+  #skill3{ top:116px; }
+  #ougie1{ top:154px; }
+  #ougie2{ top:192px; }
 
   #talkBtn{
-    right:-2px;
-    top:94px;
-    width:56px;
-    height:56px;
+    left:0;
+    top:74px;
+    width:50px;
+    height:50px;
     border-radius:999px;
     background:radial-gradient(circle at 30% 30%, #b6d8ff, var(--talk));
     color:#173b6c;
-    font-size:12px;
+    font-size:11px;
   }
 
   #itemUseBtn{
-    right:-2px;
-    bottom:-2px;
-    width:58px;
-    height:58px;
+    left:0;
+    top:140px;
+    width:52px;
+    height:52px;
     border-radius:999px;
     background:radial-gradient(circle at 30% 30%, #c9f8b1, var(--item));
     color:#29551a;
     font-size:11px;
-  }
-
-  #itemBarWrap{
-    position:absolute;
-    left:168px;
-    right:84px;
-    bottom:86px;
-    display:flex;
-    justify-content:center;
-    gap:5px;
-  }
-
-  .item-slot{
-    width:30px;
-    height:30px;
-    border-radius:8px;
-    background:rgba(255,255,255,0.48);
-    border:1px solid rgba(153,102,123,0.45);
-    color:#6b4154;
-    font-size:8px;
-    line-height:1.05;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:2px;
-  }
-
-  .item-slot.selected{
-    outline:2px solid #9e5d77;
-    background:rgba(255,255,255,0.78);
   }
 
   #menuBtn{
@@ -366,7 +399,7 @@
     font-size:11px;
     font-weight:bold;
     box-shadow:0 3px 6px rgba(0,0,0,0.1);
-    z-index:130; /* above menu */
+    z-index:130;
   }
 
   #menuPanel{
@@ -464,11 +497,18 @@
 
           <div id="zoneToast">Temporal Rift</div>
           <div id="infoBar"></div>
+          <div id="itemDisplayUI"></div>
         </div>
       </div>
     </div>
 
     <div id="controlsArea">
+      <div id="itemControlRow">
+        <button id="itemLeftBtn" class="item-control-btn">←</button>
+        <button id="itemCenterBtn" class="item-control-btn">ITEM</button>
+        <button id="itemRightBtn" class="item-control-btn">→</button>
+      </div>
+
       <div id="joystickArea">
         <div id="joyBase"></div>
         <div id="joyInnerRing"></div>
@@ -476,20 +516,17 @@
       </div>
 
       <div id="rightCluster">
-        <button id="attackBtn" class="shell-btn">ATK</button>
-
+        <button id="attackBtn" class="shell-btn stack-btn">ATK</button>
         <button id="skill1" class="shell-btn stack-btn skill-btn">S1</button>
         <button id="skill2" class="shell-btn stack-btn skill-btn">S2</button>
         <button id="skill3" class="shell-btn stack-btn skill-btn">S3</button>
-
         <button id="ougie1" class="shell-btn stack-btn ougie-btn">O1</button>
         <button id="ougie2" class="shell-btn stack-btn ougie-btn">O2</button>
 
         <button id="talkBtn" class="shell-btn">TALK</button>
-        <button id="itemUseBtn" class="shell-btn">ITEM</button>
+        <button id="itemUseBtn" class="shell-btn">USE</button>
       </div>
 
-      <div id="itemBarWrap"></div>
       <button id="menuBtn">MENU</button>
     </div>
 
@@ -515,6 +552,7 @@ const spFill = document.getElementById("spFill");
 const miniStats = document.getElementById("miniStats");
 const infoBar = document.getElementById("infoBar");
 const zoneToast = document.getElementById("zoneToast");
+const itemDisplayUI = document.getElementById("itemDisplayUI");
 
 const menuPanel = document.getElementById("menuPanel");
 const menuBtn = document.getElementById("menuBtn");
@@ -524,7 +562,9 @@ const tabButtons = document.querySelectorAll(".tabBtn");
 const attackBtn = document.getElementById("attackBtn");
 const talkBtn = document.getElementById("talkBtn");
 const itemUseBtn = document.getElementById("itemUseBtn");
-const itemBarWrap = document.getElementById("itemBarWrap");
+const itemLeftBtn = document.getElementById("itemLeftBtn");
+const itemRightBtn = document.getElementById("itemRightBtn");
+const itemCenterBtn = document.getElementById("itemCenterBtn");
 
 const skillButtons = [
   document.getElementById("skill1"),
@@ -546,7 +586,7 @@ function resizeCanvas(){
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-const GAME_VERSION = "0.32";
+const GAME_VERSION = "0.33";
 let activeTab = "player";
 let currentZone = "Temporal Rift";
 let messages = [];
@@ -554,6 +594,16 @@ let zoneToastTimer = null;
 let enemies = [];
 let joystick = { active:false, dx:0, dy:0, id:null };
 let introDone = false;
+
+/* simple inline generic potion svg */
+const potionIcon = `
+<svg viewBox="0 0 32 32" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+  <rect x="12" y="3" width="8" height="5" rx="1.5" fill="#d9eef7"/>
+  <rect x="11" y="7" width="10" height="4" rx="1.5" fill="#b9d8e6"/>
+  <path d="M10 11h12c2 0 4 2 4 5v1c0 6-5 10-10 10s-10-4-10-10v-1c0-3 2-5 4-5z" fill="#ff8aa6"/>
+  <path d="M10 18c2 2 10 2 12-2 1 5-3 11-10 11-4 0-8-3-9-8 2 1 4 1 7-1z" fill="#d84f78"/>
+  <ellipse cx="14" cy="16" rx="2" ry="3" fill="rgba(255,255,255,0.35)"/>
+</svg>`;
 
 function showZone(name){
   currentZone = name;
@@ -575,8 +625,8 @@ function logMessage(text){
 function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
 const ItemDatabase = {
-  "Potion": { type:"consumable", healHP:50 },
-  "Mega Potion": { type:"consumable", healHP:120 },
+  "Potion": { type:"consumable", healHP:50, icon:potionIcon },
+  "Mega Potion": { type:"consumable", healHP:120, icon:potionIcon },
   "Skill Card": { type:"skill_card" },
   "Unidentified Weapon ??? - Yamanaka": { type:"weapon_material" },
   "Painful Choice Papers": { type:"material" },
@@ -594,7 +644,7 @@ class InventorySystem{
     this.items[name] = clamp(cur + qty, 0, this.maxStack);
     logMessage("Obtained " + name + (qty > 1 ? " x" + qty : ""));
     renderMenu();
-    renderItemBar();
+    renderItemDisplay();
     saveGame();
   }
   removeItem(name, qty=1){
@@ -602,7 +652,7 @@ class InventorySystem{
     this.items[name] -= qty;
     if(this.items[name] <= 0) delete this.items[name];
     renderMenu();
-    renderItemBar();
+    renderItemDisplay();
     saveGame();
     return true;
   }
@@ -716,7 +766,7 @@ class Player{
     if(!data || !inventory.items[itemName]){
       logMessage("That item is unavailable.");
       this.quickItems[this.selectedQuickItem] = null;
-      renderItemBar();
+      renderItemDisplay();
       saveGame();
       return;
     }
@@ -729,7 +779,7 @@ class Player{
     } else {
       logMessage("That item cannot be used here yet.");
     }
-    renderItemBar();
+    renderItemDisplay();
     saveGame();
   }
 }
@@ -839,11 +889,6 @@ function seedInitialData(){
   }
 
   if(!equipment.weapons[0] && inventory.items["Familiar Sword"]){
-    equipment.equipWeapon("FamiliarSwordFix");
-  }
-
-  // fix for older typo/missing state
-  if(!equipment.weapons[0] && inventory.items["Familiar Sword"]){
     equipment.equipWeapon("Familiar Sword");
   }
 
@@ -856,7 +901,7 @@ function seedInitialData(){
   showZone("Temporal Rift");
   updateButtons();
   updateHud();
-  renderItemBar();
+  renderItemDisplay();
 }
 
 function spawnTemporalRift(){
@@ -893,25 +938,37 @@ function updateButtons(){
   });
 }
 
-function renderItemBar(){
-  itemBarWrap.innerHTML = "";
-  for(let i=0;i<5;i++){
-    const el = document.createElement("div");
-    el.className = "item-slot" + (player.selectedQuickItem === i ? " selected" : "");
-    const item = player.quickItems[i];
-    if(item){
-      const shortName = item.replace("Mega Potion","M-P").replace("Potion","Pot").replace("Skill Card","SC");
-      el.textContent = shortName;
-    } else {
-      el.textContent = "";
+function renderItemDisplay(){
+  itemDisplayUI.innerHTML = "";
+  for(let i=0;i<3;i++){
+    const slot = document.createElement("div");
+    slot.className = "item-display-slot" + (player.selectedQuickItem === i ? " selected" : "");
+    const itemName = player.quickItems[i];
+    if(itemName){
+      const data = ItemDatabase[itemName];
+      if(data?.icon){
+        slot.innerHTML = data.icon;
+      } else {
+        slot.textContent = "?";
+        slot.style.color = "#fff";
+      }
+
+      const count = document.createElement("div");
+      count.className = "item-count";
+      count.textContent = inventory.items[itemName] || 0;
+      slot.appendChild(count);
     }
-    el.onclick = () => {
-      player.selectedQuickItem = i;
-      renderItemBar();
-      saveGame();
-    };
-    itemBarWrap.appendChild(el);
+    itemDisplayUI.appendChild(slot);
   }
+}
+
+function cycleItemSelection(dir){
+  const max = 4;
+  player.selectedQuickItem += dir;
+  if(player.selectedQuickItem < 0) player.selectedQuickItem = max;
+  if(player.selectedQuickItem > max) player.selectedQuickItem = 0;
+  renderItemDisplay();
+  saveGame();
 }
 
 function renderMenu(){
@@ -997,7 +1054,7 @@ function addToQuickBar(itemName){
   else player.quickItems[empty] = itemName;
 
   logMessage(itemName + " added to quick bar.");
-  renderItemBar();
+  renderItemDisplay();
   saveGame();
 }
 
@@ -1026,12 +1083,6 @@ function useInventoryItem(itemName){
 }
 
 function performBasicAttack(){
-  const active = equipment.getActiveWeapon();
-  if(!active){
-    logMessage("No weapon equipped.");
-    return;
-  }
-
   let hit = false;
   enemies.forEach(enemy => {
     const dx = (enemy.x + enemy.w/2) - (player.x + player.w/2);
@@ -1040,7 +1091,7 @@ function performBasicAttack(){
     if(dist <= 34){
       const damage = Math.max(1, Math.floor(player.getAttack() / 1000));
       enemy.takeHit(damage);
-      logMessage(active.weaponClass + " hit for " + damage + ".");
+      logMessage("Basic attack hit for " + damage + ".");
       hit = true;
     }
   });
@@ -1067,8 +1118,8 @@ function talkToNearbyNPC(){
     return;
   }
 
-  const aoi = { x: canvas.width * 0.44 + 6, y: canvas.height * 0.51 + 9, name: "Kotonoha Aoi" };
-  const akane = { x: canvas.width * 0.52 + 6, y: canvas.height * 0.51 + 9, name: "Kotonoha Akane" };
+  const aoi = { x: canvas.width * 0.44 + 6, y: canvas.height * 0.51 + 9 };
+  const akane = { x: canvas.width * 0.52 + 6, y: canvas.height * 0.51 + 9 };
   const px = player.x + player.w/2;
   const py = player.y + player.h/2;
 
@@ -1083,17 +1134,14 @@ function talkToNearbyNPC(){
   if(!introDone){
     logMessage('Aoi: "OMG bestie ur finally here!"');
     logMessage('Akane: "Somethings happened to Onigashima..."');
-    logMessage('Aoi: "Go to Cave of Memories and fix your memory."');
+    logMessage('Aoi: "Go fix your memory in Cave of Memories."');
     introDone = true;
     saveGame();
     return;
   }
 
-  if(da < dk){
-    logMessage('Aoi: "Storage and Identify systems coming next."');
-  } else {
-    logMessage('Akane: "Smithing system coming next, bestie."');
-  }
+  if(da < dk) logMessage('Aoi: "Storage/Identify coming next."');
+  else logMessage('Akane: "Smithing coming next, bestie."');
 }
 
 function saveGame(){
@@ -1171,15 +1219,12 @@ function drawTemporalRift(){
   ctx.arc(w*0.476 + 6, h*0.35, 10, 0, Math.PI * 2);
   ctx.fill();
 
-  // Aoi
   ctx.fillStyle = "#7fd1ff";
   ctx.fillRect(w*0.44, h*0.51, 12, 18);
 
-  // Akane
   ctx.fillStyle = "#ff88a8";
   ctx.fillRect(w*0.52, h*0.51, 12, 18);
 
-  // portal
   ctx.fillStyle = "rgba(74,168,255,0.85)";
   ctx.beginPath();
   ctx.arc(w*0.79, h*0.56, 18, 0, Math.PI * 2);
@@ -1274,7 +1319,6 @@ function loop(){
   requestAnimationFrame(loop);
 }
 
-/* JOYSTICK */
 function resetJoystickVisual(){
   joyStick.style.left = "42px";
   joyStick.style.top = "42px";
@@ -1303,23 +1347,21 @@ function updateJoystick(clientX, clientY){
 }
 
 joyArea.addEventListener("touchstart", (e) => {
-  e.preventDefault();
   const t = e.changedTouches[0];
   joystick.active = true;
   joystick.id = t.identifier;
   updateJoystick(t.clientX, t.clientY);
-}, { passive:false });
+}, { passive:true });
 
 document.addEventListener("touchmove", (e) => {
   if(!joystick.active) return;
   for(const t of e.changedTouches){
     if(t.identifier === joystick.id){
-      e.preventDefault();
       updateJoystick(t.clientX, t.clientY);
       break;
     }
   }
-}, { passive:false });
+}, { passive:true });
 
 function endJoystickTouch(e){
   if(!joystick.active) return;
@@ -1335,28 +1377,42 @@ function endJoystickTouch(e){
   }
 }
 
-document.addEventListener("touchend", endJoystickTouch, { passive:false });
-document.addEventListener("touchcancel", endJoystickTouch, { passive:false });
+document.addEventListener("touchend", endJoystickTouch, { passive:true });
+document.addEventListener("touchcancel", endJoystickTouch, { passive:true });
 
-menuBtn.onclick = () => {
+function bindTap(el, fn){
+  el.addEventListener("touchstart", (e) => {
+    fn(e);
+  }, { passive:true });
+
+  el.addEventListener("click", (e) => {
+    fn(e);
+  });
+}
+
+bindTap(menuBtn, () => {
   menuPanel.style.display = menuPanel.style.display === "none" ? "block" : "none";
   renderMenu();
-};
+});
 
 tabButtons.forEach(btn => {
-  btn.onclick = () => {
+  bindTap(btn, () => {
     tabButtons.forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     activeTab = btn.dataset.tab;
     renderMenu();
-  };
+  });
 });
 
-attackBtn.onclick = performBasicAttack;
-talkBtn.onclick = talkToNearbyNPC;
-itemUseBtn.onclick = () => player.useSelectedItem();
-skillButtons.forEach(btn => btn.onclick = () => logMessage("Skill system later."));
-ougieButtons.forEach(btn => btn.onclick = () => logMessage("Ougie system later."));
+bindTap(attackBtn, performBasicAttack);
+bindTap(talkBtn, talkToNearbyNPC);
+bindTap(itemUseBtn, () => player.useSelectedItem());
+bindTap(itemLeftBtn, () => cycleItemSelection(-1));
+bindTap(itemRightBtn, () => cycleItemSelection(1));
+bindTap(itemCenterBtn, () => player.useSelectedItem());
+
+skillButtons.forEach(btn => bindTap(btn, () => logMessage("Skill system later.")));
+ougieButtons.forEach(btn => bindTap(btn, () => logMessage("Ougie system later.")));
 
 if(!loadGame()){
   seedInitialData();
@@ -1369,12 +1425,17 @@ if(!loadGame()){
     spawnDimensionOfMemories();
     showZone("Dimension of Memories");
   }
+
+  if(!equipment.weapons[0] && inventory.items["Familiar Sword"]){
+    equipment.equipWeapon("Familiar Sword");
+  }
+
   updateButtons();
   updateHud();
-  renderItemBar();
+  renderItemDisplay();
 }
 
-logMessage("Onigiri 2 v0.32 loaded.");
+logMessage("Onigiri 2 v0.33 loaded.");
 loop();
 </script>
 </body>
