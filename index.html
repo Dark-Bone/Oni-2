@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Onigiri 2 v0.33</title>
+<title>Onigiri 2 v0.34</title>
 <style>
   :root{
     --shell-pink-1:#f7dce7;
@@ -20,6 +20,7 @@
     --ougie:#f3a44e;
     --item:#8fd86b;
     --talk:#64a8ff;
+    --menu:#f8eef2;
   }
 
   *{
@@ -177,7 +178,7 @@
     position:absolute;
     left:6px;
     bottom:6px;
-    width:46%;
+    width:44%;
     max-height:56px;
     overflow:hidden;
     border-radius:9px;
@@ -188,20 +189,19 @@
     line-height:1.25;
   }
 
-  /* screen item display UI */
   #itemDisplayUI{
     position:absolute;
     right:6px;
     bottom:6px;
-    width:116px;
+    width:166px;
     display:flex;
     justify-content:flex-end;
-    gap:4px;
+    gap:3px;
   }
 
   .item-display-slot{
-    width:32px;
-    height:32px;
+    width:28px;
+    height:28px;
     border-radius:8px;
     background:rgba(18,18,24,0.52);
     border:1px solid rgba(255,255,255,0.16);
@@ -213,12 +213,12 @@
   }
 
   .item-display-slot.selected{
-    outline:2px solid rgba(255,255,255,0.7);
+    outline:2px solid rgba(255,255,255,0.72);
   }
 
   .item-count{
     position:absolute;
-    right:2px;
+    right:1px;
     bottom:1px;
     font-size:7px;
     color:#fff;
@@ -235,11 +235,41 @@
     top:calc(53% + 54px);
   }
 
-  /* joystick */
+  #itemControlRow{
+    position:absolute;
+    left:20px;
+    bottom:284px;
+    width:150px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  .item-control-btn{
+    border:none;
+    border-radius:999px;
+    height:34px;
+    color:#734558;
+    font-weight:bold;
+    background:linear-gradient(180deg,#f8eef2,#debfcd);
+    border:1px solid #b98ca0;
+    box-shadow:0 3px 6px rgba(0,0,0,0.1);
+  }
+
+  #itemLeftBtn, #itemRightBtn{
+    width:40px;
+    font-size:18px;
+  }
+
+  #itemCenterBtn{
+    width:58px;
+    font-size:11px;
+  }
+
   #joystickArea{
     position:absolute;
     left:28px;
-    bottom:110px;
+    bottom:138px;
     width:128px;
     height:128px;
     touch-action:none;
@@ -277,45 +307,12 @@
     box-shadow:0 3px 8px rgba(0,0,0,0.14);
   }
 
-  /* item control buttons above joystick */
-  #itemControlRow{
-    position:absolute;
-    left:20px;
-    bottom:248px;
-    width:146px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
-
-  .item-control-btn{
-    border:none;
-    border-radius:999px;
-    height:34px;
-    color:#734558;
-    font-weight:bold;
-    background:linear-gradient(180deg,#f8eef2,#debfcd);
-    border:1px solid #b98ca0;
-    box-shadow:0 3px 6px rgba(0,0,0,0.1);
-  }
-
-  #itemLeftBtn, #itemRightBtn{
-    width:40px;
-    font-size:18px;
-  }
-
-  #itemCenterBtn{
-    width:54px;
-    font-size:11px;
-  }
-
-  /* right cluster */
   #rightCluster{
     position:absolute;
-    right:18px;
-    bottom:88px;
-    width:132px;
-    height:278px;
+    right:30px;
+    bottom:62px;
+    width:142px;
+    height:286px;
   }
 
   .shell-btn{
@@ -333,15 +330,15 @@
   }
 
   .stack-btn{
-    left:38px;
-    width:76px;
+    left:32px;
+    width:78px;
     height:34px;
     border-radius:999px;
     font-size:13px;
   }
 
   #attackBtn{
-    top:0;
+    top:20px;
     background:radial-gradient(circle at 30% 30%, #e2c5a8, var(--attack));
     color:#5d3e24;
   }
@@ -356,17 +353,17 @@
     color:#7b4311;
   }
 
-  #skill1{ top:40px; }
-  #skill2{ top:78px; }
-  #skill3{ top:116px; }
-  #ougie1{ top:154px; }
-  #ougie2{ top:192px; }
+  #skill1{ top:60px; }
+  #skill2{ top:98px; }
+  #skill3{ top:136px; }
+  #ougie1{ top:174px; }
+  #ougie2{ top:212px; }
 
   #talkBtn{
-    left:0;
-    top:74px;
-    width:50px;
-    height:50px;
+    right:0;
+    top:118px;
+    width:52px;
+    height:52px;
     border-radius:999px;
     background:radial-gradient(circle at 30% 30%, #b6d8ff, var(--talk));
     color:#173b6c;
@@ -374,10 +371,10 @@
   }
 
   #itemUseBtn{
-    left:0;
-    top:140px;
-    width:52px;
-    height:52px;
+    right:0;
+    top:178px;
+    width:54px;
+    height:54px;
     border-radius:999px;
     background:radial-gradient(circle at 30% 30%, #c9f8b1, var(--item));
     color:#29551a;
@@ -402,7 +399,7 @@
     z-index:130;
   }
 
-  #menuPanel{
+  #menuPanel, #dungeonPanel{
     position:absolute;
     inset:14px;
     border-radius:16px;
@@ -438,6 +435,36 @@
     height:calc(100% - 40px);
     overflow:auto;
     font-size:12px;
+  }
+
+  #dungeonPanel{
+    inset:auto 22px 92px 22px;
+    height:188px;
+    padding:14px;
+    z-index:120;
+  }
+
+  #dungeonTitle{
+    font-size:16px;
+    font-weight:bold;
+    margin-bottom:8px;
+  }
+
+  #dungeonText{
+    font-size:11px;
+    color:#d9ccda;
+    margin-bottom:12px;
+  }
+
+  .dungeon-btn{
+    width:100%;
+    height:34px;
+    border:none;
+    border-radius:10px;
+    margin-bottom:8px;
+    background:#8d6074;
+    color:#fff;
+    font-weight:bold;
   }
 
   .row{
@@ -537,6 +564,15 @@
       </div>
       <div id="menuContent"></div>
     </div>
+
+    <div id="dungeonPanel">
+      <div id="dungeonTitle">Enter Cave of Memories?</div>
+      <div id="dungeonText">Select difficulty.</div>
+      <button id="normalBtn" class="dungeon-btn">Normal</button>
+      <button id="hardBtn" class="dungeon-btn">Hard</button>
+      <button id="hellBtn" class="dungeon-btn">Hell</button>
+      <button id="cancelDungeonBtn" class="dungeon-btn">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -558,6 +594,12 @@ const menuPanel = document.getElementById("menuPanel");
 const menuBtn = document.getElementById("menuBtn");
 const menuContent = document.getElementById("menuContent");
 const tabButtons = document.querySelectorAll(".tabBtn");
+
+const dungeonPanel = document.getElementById("dungeonPanel");
+const normalBtn = document.getElementById("normalBtn");
+const hardBtn = document.getElementById("hardBtn");
+const hellBtn = document.getElementById("hellBtn");
+const cancelDungeonBtn = document.getElementById("cancelDungeonBtn");
 
 const attackBtn = document.getElementById("attackBtn");
 const talkBtn = document.getElementById("talkBtn");
@@ -586,18 +628,19 @@ function resizeCanvas(){
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-const GAME_VERSION = "0.33";
+const GAME_VERSION = "0.34";
 let activeTab = "player";
 let currentZone = "Temporal Rift";
+let currentDifficulty = "Normal";
 let messages = [];
 let zoneToastTimer = null;
 let enemies = [];
+let pendingRespawns = [];
 let joystick = { active:false, dx:0, dy:0, id:null };
 let introDone = false;
 
-/* simple inline generic potion svg */
 const potionIcon = `
-<svg viewBox="0 0 32 32" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 32 32" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
   <rect x="12" y="3" width="8" height="5" rx="1.5" fill="#d9eef7"/>
   <rect x="11" y="7" width="10" height="4" rx="1.5" fill="#b9d8e6"/>
   <path d="M10 11h12c2 0 4 2 4 5v1c0 6-5 10-10 10s-10-4-10-10v-1c0-3 2-5 4-5z" fill="#ff8aa6"/>
@@ -627,6 +670,7 @@ function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 const ItemDatabase = {
   "Potion": { type:"consumable", healHP:50, icon:potionIcon },
   "Mega Potion": { type:"consumable", healHP:120, icon:potionIcon },
+  "Familiar Fragments": { type:"material" },
   "Skill Card": { type:"skill_card" },
   "Unidentified Weapon ??? - Yamanaka": { type:"weapon_material" },
   "Painful Choice Papers": { type:"material" },
@@ -748,11 +792,15 @@ class Player{
     if(this.hp <= 0) this.onDeath();
   }
   onDeath(){
-    logMessage("You died. Resetting position.");
     this.hp = this.maxHP;
     this.sp = this.maxSP;
-    this.x = 90;
-    this.y = 126;
+    if(currentZone === "Cave of Memories" || currentZone === "Cave of Memories Boss"){
+      this.x = 40;
+      this.y = canvas.height * 0.72;
+    } else {
+      this.x = 90;
+      this.y = 126;
+    }
     updateHud();
     saveGame();
   }
@@ -785,23 +833,27 @@ class Player{
 }
 
 class Enemy{
-  constructor(type, x, y, color){
+  constructor(type, x, y, color, options = {}){
     this.type = type;
     this.spawnX = x;
     this.spawnY = y;
     this.x = x;
     this.y = y;
-    this.w = 16;
-    this.h = 16;
-    this.hp = 5;
-    this.maxHP = 5;
+    this.w = options.w || 16;
+    this.h = options.h || 16;
+    this.hp = options.hp || 5;
+    this.maxHP = options.hp || 5;
     this.color = color;
     this.state = "idle";
-    this.detectRange = 72;
-    this.attackRange = 18;
+    this.detectRange = options.detectRange || 72;
+    this.attackRange = options.attackRange || 18;
     this.cooldown = 0;
     this.wanderTimer = 0;
     this.wanderAngle = Math.random() * Math.PI * 2;
+    this.isFieldMob = !!options.isFieldMob;
+    this.respawnMs = options.respawnMs || 5000;
+    this.onDeathDrop = options.onDeathDrop || null;
+    this.speed = options.speed || 0.5;
   }
 
   update(){
@@ -839,11 +891,10 @@ class Enemy{
       if(dist > this.attackRange){
         const nx = dx / (dist || 1);
         const ny = dy / (dist || 1);
-        this.x += nx * 0.50;
-        this.y += ny * 0.50;
+        this.x += nx * this.speed;
+        this.y += ny * this.speed;
       } else if(this.cooldown <= 0){
         player.takeDamage(2);
-        logMessage(this.type + " hit you.");
         this.cooldown = 55;
       }
     }
@@ -857,15 +908,22 @@ class Enemy{
   }
 
   die(){
-    logMessage(this.type + " defeated.");
-    dropLoot();
+    if(this.onDeathDrop) this.onDeathDrop(this);
+    if(this.isFieldMob){
+      pendingRespawns.push({
+        type:this.type,
+        x:this.spawnX,
+        y:this.spawnY,
+        time:Date.now() + this.respawnMs
+      });
+    }
     enemies = enemies.filter(e => e !== this);
   }
 
   draw(){
     ctx.fillStyle = this.color;
     ctx.beginPath();
-    ctx.arc(this.x + 8, this.y + 8, 8, 0, Math.PI * 2);
+    ctx.arc(this.x + this.w/2, this.y + this.h/2, this.w/2, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = "rgba(0,0,0,0.18)";
@@ -878,6 +936,53 @@ class Enemy{
 const inventory = new InventorySystem();
 const equipment = new EquipmentSystem();
 const player = new Player();
+
+function createFamiliarDaruma(x, y){
+  return new Enemy("Familiar Daruma", x, y, "#6e5868", {
+    hp:5,
+    detectRange:72,
+    attackRange:18,
+    isFieldMob:true,
+    respawnMs:5000,
+    speed:0.5,
+    onDeathDrop: () => {
+      if(Math.random() < 0.5){
+        inventory.addItem("Familiar Fragments", 1);
+      }
+    }
+  });
+}
+
+function createDungeonDaruma(type, x, y){
+  const color = type === "Evil Daruma" ? "#3a2239" : "#f2f2f2";
+  const hpMap = { Normal:5, Hard:7, Hell:10 };
+  return new Enemy(type, x, y, color, {
+    hp:hpMap[currentDifficulty] || 5,
+    detectRange:90,
+    attackRange:18,
+    isFieldMob:false,
+    speed:0.55
+  });
+}
+
+function createYamanaka(){
+  const hpMap = { Normal:12, Hard:18, Hell:24 };
+  return new Enemy("Yamanaka", canvas.width * 0.5 - 18, canvas.height * 0.38, "#9a6ae0", {
+    hp:hpMap[currentDifficulty] || 12,
+    w:36,
+    h:36,
+    detectRange:130,
+    attackRange:24,
+    isFieldMob:false,
+    speed:0.42,
+    onDeathDrop: () => {
+      logMessage("Yamanaka defeated.");
+      spawnBossExitPortal = true;
+    }
+  });
+}
+
+let spawnBossExitPortal = false;
 
 function seedInitialData(){
   if(Object.keys(inventory.items).length === 0){
@@ -906,17 +1011,42 @@ function seedInitialData(){
 
 function spawnTemporalRift(){
   enemies = [];
+  pendingRespawns = [];
+  spawnBossExitPortal = false;
 }
 
 function spawnDimensionOfMemories(){
   enemies = [
-    new Enemy("Unnamed Mob", 170, 64, "#6e5868"),
-    new Enemy("Unnamed Mob", 218, 90, "#78607a"),
-    new Enemy("Unnamed Mob", 270, 104, "#6d717f"),
-    new Enemy("Unnamed Mob", 228, 150, "#587057"),
-    new Enemy("Unnamed Mob", 126, 154, "#7f4d62"),
-    new Enemy("Unnamed Mob", 300, 76, "#47617d")
+    createFamiliarDaruma(170, 64),
+    createFamiliarDaruma(218, 90),
+    createFamiliarDaruma(270, 104),
+    createFamiliarDaruma(228, 150),
+    createFamiliarDaruma(126, 154),
+    createFamiliarDaruma(300, 76)
   ];
+  pendingRespawns = [];
+  spawnBossExitPortal = false;
+}
+
+function spawnCaveOfMemories(){
+  enemies = [
+    createDungeonDaruma("Evil Daruma", 74, 72),
+    createDungeonDaruma("Angel Daruma", 136, 88),
+    createDungeonDaruma("Evil Daruma", 196, 64),
+    createDungeonDaruma("Angel Daruma", 262, 94),
+    createDungeonDaruma("Evil Daruma", 108, 150),
+    createDungeonDaruma("Angel Daruma", 166, 164),
+    createDungeonDaruma("Evil Daruma", 236, 154),
+    createDungeonDaruma("Angel Daruma", 292, 130)
+  ];
+  pendingRespawns = [];
+  spawnBossExitPortal = false;
+}
+
+function spawnBossRoom(){
+  enemies = [ createYamanaka() ];
+  pendingRespawns = [];
+  spawnBossExitPortal = false;
 }
 
 function updateHud(){
@@ -940,7 +1070,7 @@ function updateButtons(){
 
 function renderItemDisplay(){
   itemDisplayUI.innerHTML = "";
-  for(let i=0;i<3;i++){
+  for(let i=0;i<5;i++){
     const slot = document.createElement("div");
     slot.className = "item-display-slot" + (player.selectedQuickItem === i ? " selected" : "");
     const itemName = player.quickItems[i];
@@ -1091,57 +1221,137 @@ function performBasicAttack(){
     if(dist <= 34){
       const damage = Math.max(1, Math.floor(player.getAttack() / 1000));
       enemy.takeHit(damage);
-      logMessage("Basic attack hit for " + damage + ".");
       hit = true;
     }
   });
 
-  if(!hit) logMessage("Attack missed.");
+  if(!hit){
+    // intentionally no log spam
+  }
   saveGame();
 }
 
-function dropLoot(){
-  const pool = [
-    "Potion",
-    "Painful Choice Papers",
-    "Photoshopped Photos",
-    "Skill Card",
-    "Unidentified Weapon ??? - Yamanaka"
-  ];
-  const item = pool[Math.floor(Math.random() * pool.length)];
-  inventory.addItem(item,1);
+function talkToNearbyThing(){
+  if(currentZone === "Temporal Rift"){
+    const aoi = { x: canvas.width * 0.44 + 6, y: canvas.height * 0.51 + 9 };
+    const akane = { x: canvas.width * 0.52 + 6, y: canvas.height * 0.51 + 9 };
+    const portal = { x: canvas.width * 0.79, y: canvas.height * 0.56 };
+    const warding = { x: canvas.width * 0.50, y: canvas.height * 0.14 };
+    const px = player.x + player.w/2;
+    const py = player.y + player.h/2;
+
+    const da = Math.hypot(px - aoi.x, py - aoi.y);
+    const dk = Math.hypot(px - akane.x, py - akane.y);
+    const dp = Math.hypot(px - portal.x, py - portal.y);
+    const dw = Math.hypot(px - warding.x, py - warding.y);
+
+    if(dp <= 28){
+      currentZone = "Dimension of Memories";
+      player.zone = currentZone;
+      player.x = 40;
+      player.y = canvas.height * 0.55;
+      spawnDimensionOfMemories();
+      showZone("Dimension of Memories");
+      logMessage("Entered Dimension of Memories.");
+      saveGame();
+      return;
+    }
+
+    if(dw <= 26){
+      logMessage("The Warding is unavailable for now.");
+      return;
+    }
+
+    if(Math.min(da, dk) <= 36){
+      logMessage("They have nothing to say yet.");
+      return;
+    }
+
+    logMessage("Nothing nearby to interact with.");
+    return;
+  }
+
+  if(currentZone === "Dimension of Memories"){
+    const cavePortal = { x: canvas.width * 0.52, y: canvas.height * 0.16 };
+    const px = player.x + player.w/2;
+    const py = player.y + player.h/2;
+    const dp = Math.hypot(px - cavePortal.x, py - cavePortal.y);
+
+    if(dp <= 24){
+      dungeonPanel.style.display = "block";
+      return;
+    }
+
+    logMessage("Nothing nearby to interact with.");
+    return;
+  }
+
+  if(currentZone === "Cave of Memories"){
+    const purplePortal = { x: canvas.width * 0.86, y: canvas.height * 0.14 };
+    const exitPortal = { x: canvas.width * 0.08, y: canvas.height * 0.84 };
+    const px = player.x + player.w/2;
+    const py = player.y + player.h/2;
+
+    if(Math.hypot(px - purplePortal.x, py - purplePortal.y) <= 24){
+      currentZone = "Cave of Memories Boss";
+      player.zone = currentZone;
+      player.x = canvas.width * 0.5 - 9;
+      player.y = canvas.height * 0.76;
+      spawnBossRoom();
+      showZone("Cave of Memories Boss");
+      logMessage("Entered boss room.");
+      saveGame();
+      return;
+    }
+
+    if(Math.hypot(px - exitPortal.x, py - exitPortal.y) <= 24){
+      currentZone = "Dimension of Memories";
+      player.zone = currentZone;
+      player.x = 40;
+      player.y = canvas.height * 0.55;
+      spawnDimensionOfMemories();
+      showZone("Dimension of Memories");
+      logMessage("Returned to Dimension of Memories.");
+      saveGame();
+      return;
+    }
+
+    logMessage("Nothing nearby to interact with.");
+    return;
+  }
+
+  if(currentZone === "Cave of Memories Boss"){
+    const exitPortal = { x: canvas.width * 0.5, y: canvas.height * 0.18 };
+    const px = player.x + player.w/2;
+    const py = player.y + player.h/2;
+
+    if(spawnBossExitPortal && Math.hypot(px - exitPortal.x, py - exitPortal.y) <= 24){
+      currentZone = "Dimension of Memories";
+      player.zone = currentZone;
+      player.x = 40;
+      player.y = canvas.height * 0.55;
+      spawnDimensionOfMemories();
+      showZone("Dimension of Memories");
+      logMessage("Returned outside the dungeon.");
+      saveGame();
+      return;
+    }
+
+    logMessage("Nothing nearby to interact with.");
+  }
 }
 
-function talkToNearbyNPC(){
-  if(currentZone !== "Temporal Rift"){
-    logMessage("No one to talk to here.");
-    return;
-  }
-
-  const aoi = { x: canvas.width * 0.44 + 6, y: canvas.height * 0.51 + 9 };
-  const akane = { x: canvas.width * 0.52 + 6, y: canvas.height * 0.51 + 9 };
-  const px = player.x + player.w/2;
-  const py = player.y + player.h/2;
-
-  const da = Math.hypot(px - aoi.x, py - aoi.y);
-  const dk = Math.hypot(px - akane.x, py - akane.y);
-
-  if(Math.min(da, dk) > 36){
-    logMessage("No NPC close enough.");
-    return;
-  }
-
-  if(!introDone){
-    logMessage('Aoi: "OMG bestie ur finally here!"');
-    logMessage('Akane: "Somethings happened to Onigashima..."');
-    logMessage('Aoi: "Go fix your memory in Cave of Memories."');
-    introDone = true;
-    saveGame();
-    return;
-  }
-
-  if(da < dk) logMessage('Aoi: "Storage/Identify coming next."');
-  else logMessage('Akane: "Smithing coming next, bestie."');
+function openDungeonWithDifficulty(diff){
+  currentDifficulty = diff;
+  dungeonPanel.style.display = "none";
+  currentZone = "Cave of Memories";
+  player.zone = currentZone;
+  player.x = 36;
+  player.y = canvas.height * 0.76;
+  spawnCaveOfMemories();
+  showZone("Cave of Memories");
+  logMessage("Entered Cave of Memories (" + diff + ").");
+  saveGame();
 }
 
 function saveGame(){
@@ -1163,7 +1373,8 @@ function saveGame(){
     },
     inventory: inventory.items,
     equipment: equipment,
-    introDone
+    introDone,
+    currentDifficulty
   };
   localStorage.setItem("onigiri2_save", JSON.stringify(saveData));
 }
@@ -1182,6 +1393,7 @@ function loadGame(){
       equipment.activeWeaponIndex = save.equipment.activeWeaponIndex || 0;
     }
     introDone = !!save.introDone;
+    currentDifficulty = save.currentDifficulty || "Normal";
     player.zone = save.player?.zone || "Temporal Rift";
     return true;
   }catch(e){
@@ -1192,24 +1404,33 @@ function loadGame(){
 
 function drawTemporalRift(){
   const w = canvas.width, h = canvas.height;
-  ctx.fillStyle = "#d9dde5";
+  ctx.fillStyle = "#dfe4ec";
   ctx.fillRect(0,0,w,h);
 
-  ctx.fillStyle = "#cfd5de";
+  ctx.fillStyle = "#f4f0dd";
   ctx.beginPath();
-  ctx.ellipse(w*0.5, h*0.58, w*0.38, h*0.26, 0, 0, Math.PI * 2);
+  ctx.ellipse(w*0.5, h*0.58, w*0.26, h*0.18, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.strokeStyle = "rgba(94,142,255,0.7)";
+  ctx.fillStyle = "#d2d8e1";
+  ctx.beginPath();
+  ctx.ellipse(w*0.5, h*0.58, w*0.40, h*0.27, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(0,0,0,0.18)";
+  ctx.fillRect(0,0,w,28);
+  ctx.fillRect(0,h-28,w,28);
+
+  ctx.strokeStyle = "rgba(94,142,255,0.78)";
   ctx.lineWidth = 6;
   ctx.beginPath();
-  ctx.ellipse(w*0.5, h*0.58, w*0.45, h*0.31, 0, 0, Math.PI * 2);
+  ctx.ellipse(w*0.5, h*0.58, w*0.46, h*0.31, 0, 0, Math.PI * 2);
   ctx.stroke();
 
-  ctx.strokeStyle = "rgba(255,118,212,0.55)";
+  ctx.strokeStyle = "rgba(255,118,212,0.60)";
   ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.ellipse(w*0.5, h*0.58, w*0.42, h*0.285, 0, 0, Math.PI * 2);
+  ctx.ellipse(w*0.5, h*0.58, w*0.43, h*0.285, 0, 0, Math.PI * 2);
   ctx.stroke();
 
   ctx.fillStyle = "#bfc6d1";
@@ -1229,6 +1450,11 @@ function drawTemporalRift(){
   ctx.beginPath();
   ctx.arc(w*0.79, h*0.56, 18, 0, Math.PI * 2);
   ctx.fill();
+
+  ctx.fillStyle = "rgba(160,110,255,0.78)";
+  ctx.beginPath();
+  ctx.arc(w*0.50, h*0.14, 16, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 function drawDimensionOfMemories(){
@@ -1239,6 +1465,9 @@ function drawDimensionOfMemories(){
   ctx.fillStyle = "#697163";
   ctx.fillRect(0,h-50,w,50);
 
+  ctx.fillStyle = "#747b71";
+  ctx.fillRect(0,0,w,20);
+
   ctx.fillStyle = "rgba(90,90,90,0.38)";
   for(let i=0;i<9;i++){
     ctx.fillRect(16 + i*34, 42 + (i%3)*48, 9, 34);
@@ -1248,6 +1477,52 @@ function drawDimensionOfMemories(){
   ctx.beginPath();
   ctx.arc(w*0.52, h*0.16, 14, 0, Math.PI*2);
   ctx.fill();
+}
+
+function drawCaveOfMemories(){
+  const w = canvas.width, h = canvas.height;
+  ctx.fillStyle = "#6d6b66";
+  ctx.fillRect(0,0,w,h);
+
+  ctx.fillStyle = "#585650";
+  ctx.fillRect(0,h-42,w,42);
+
+  ctx.fillStyle = "#8c877a";
+  ctx.fillRect(38, 42, 34, h-84);
+  ctx.fillRect(110, 26, 30, h-120);
+  ctx.fillRect(176, 52, 28, h-90);
+  ctx.fillRect(242, 28, 32, h-110);
+
+  ctx.fillStyle = "rgba(170,90,255,0.85)";
+  ctx.beginPath();
+  ctx.arc(w*0.86, h*0.14, 14, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(120,170,255,0.85)";
+  ctx.beginPath();
+  ctx.arc(w*0.08, h*0.84, 14, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function drawBossRoom(){
+  const w = canvas.width, h = canvas.height;
+  ctx.fillStyle = "#241718";
+  ctx.fillRect(0,0,w,h);
+
+  ctx.fillStyle = "#682c2c";
+  ctx.fillRect(0,h-42,w,42);
+
+  ctx.fillStyle = "rgba(255,120,60,0.18)";
+  for(let i=0;i<6;i++){
+    ctx.fillRect(18 + i*54, 26 + (i%2)*24, 18, 48);
+  }
+
+  if(spawnBossExitPortal){
+    ctx.fillStyle = "rgba(120,170,255,0.90)";
+    ctx.beginPath();
+    ctx.arc(w*0.5, h*0.18, 16, 0, Math.PI*2);
+    ctx.fill();
+  }
 }
 
 function drawPlayer(){
@@ -1276,38 +1551,35 @@ function drawPlayer(){
   }
 }
 
+function handleRespawns(){
+  if(currentZone !== "Dimension of Memories") return;
+  const now = Date.now();
+  const ready = pendingRespawns.filter(r => r.time <= now);
+  pendingRespawns = pendingRespawns.filter(r => r.time > now);
+  ready.forEach(r => {
+    enemies.push(createFamiliarDaruma(r.x, r.y));
+  });
+}
+
 function update(){
-  if(menuPanel.style.display !== "none") return;
+  if(menuPanel.style.display !== "none" || dungeonPanel.style.display !== "none") return;
 
   if(joystick.dx !== 0 || joystick.dy !== 0){
     player.move(joystick.dx, joystick.dy);
   }
 
   enemies.forEach(enemy => enemy.update());
-
-  if(currentZone === "Temporal Rift"){
-    const portalX = canvas.width * 0.79;
-    const portalY = canvas.height * 0.56;
-    const dist = Math.hypot((player.x + 9) - portalX, (player.y + 11) - portalY);
-    if(dist < 22){
-      currentZone = "Dimension of Memories";
-      player.zone = currentZone;
-      player.x = 40;
-      player.y = canvas.height * 0.55;
-      spawnDimensionOfMemories();
-      showZone("Dimension of Memories");
-      logMessage("Entered Dimension of Memories.");
-      saveGame();
-    }
-  }
-
+  handleRespawns();
   updateHud();
 }
 
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
+
   if(currentZone === "Temporal Rift") drawTemporalRift();
-  else drawDimensionOfMemories();
+  else if(currentZone === "Dimension of Memories") drawDimensionOfMemories();
+  else if(currentZone === "Cave of Memories") drawCaveOfMemories();
+  else drawBossRoom();
 
   enemies.forEach(enemy => enemy.draw());
   drawPlayer();
@@ -1381,16 +1653,12 @@ document.addEventListener("touchend", endJoystickTouch, { passive:true });
 document.addEventListener("touchcancel", endJoystickTouch, { passive:true });
 
 function bindTap(el, fn){
-  el.addEventListener("touchstart", (e) => {
-    fn(e);
-  }, { passive:true });
-
-  el.addEventListener("click", (e) => {
-    fn(e);
-  });
+  el.addEventListener("touchstart", () => fn(), { passive:true });
+  el.addEventListener("click", () => fn());
 }
 
 bindTap(menuBtn, () => {
+  if(dungeonPanel.style.display === "block") dungeonPanel.style.display = "none";
   menuPanel.style.display = menuPanel.style.display === "none" ? "block" : "none";
   renderMenu();
 });
@@ -1405,7 +1673,7 @@ tabButtons.forEach(btn => {
 });
 
 bindTap(attackBtn, performBasicAttack);
-bindTap(talkBtn, talkToNearbyNPC);
+bindTap(talkBtn, talkToNearbyThing);
 bindTap(itemUseBtn, () => player.useSelectedItem());
 bindTap(itemLeftBtn, () => cycleItemSelection(-1));
 bindTap(itemRightBtn, () => cycleItemSelection(1));
@@ -1414,16 +1682,28 @@ bindTap(itemCenterBtn, () => player.useSelectedItem());
 skillButtons.forEach(btn => bindTap(btn, () => logMessage("Skill system later.")));
 ougieButtons.forEach(btn => bindTap(btn, () => logMessage("Ougie system later.")));
 
+bindTap(normalBtn, () => openDungeonWithDifficulty("Normal"));
+bindTap(hardBtn, () => openDungeonWithDifficulty("Hard"));
+bindTap(hellBtn, () => openDungeonWithDifficulty("Hell"));
+bindTap(cancelDungeonBtn, () => {
+  dungeonPanel.style.display = "none";
+});
+
 if(!loadGame()){
   seedInitialData();
 } else {
-  currentZone = player.zone || "Temporal Rift";
   if(currentZone === "Temporal Rift"){
     spawnTemporalRift();
     showZone("Temporal Rift");
-  } else {
+  } else if(currentZone === "Dimension of Memories"){
     spawnDimensionOfMemories();
     showZone("Dimension of Memories");
+  } else if(currentZone === "Cave of Memories"){
+    spawnCaveOfMemories();
+    showZone("Cave of Memories");
+  } else {
+    spawnBossRoom();
+    showZone("Cave of Memories Boss");
   }
 
   if(!equipment.weapons[0] && inventory.items["Familiar Sword"]){
@@ -1435,7 +1715,7 @@ if(!loadGame()){
   renderItemDisplay();
 }
 
-logMessage("Onigiri 2 v0.33 loaded.");
+logMessage("Onigiri 2 v0.34 loaded.");
 loop();
 </script>
 </body>
