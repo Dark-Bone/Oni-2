@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Onigiri 2 v0.34</title>
+<title>Onigiri 2 v0.35</title>
 <style>
   :root{
     --shell-pink-1:#f7dce7;
@@ -11,7 +11,7 @@
     --shell-line:#c990a9;
     --screen-border:#e6bfd1;
 
-    --hud-bg:rgba(12,12,16,0.48);
+    --hud-bg:rgba(12,12,16,0.50);
     --hp:#d4587a;
     --sp:#6eaef5;
 
@@ -20,7 +20,6 @@
     --ougie:#f3a44e;
     --item:#8fd86b;
     --talk:#64a8ff;
-    --menu:#f8eef2;
   }
 
   *{
@@ -272,7 +271,6 @@
     bottom:138px;
     width:128px;
     height:128px;
-    touch-action:none;
   }
 
   #joyBase{
@@ -628,7 +626,7 @@ function resizeCanvas(){
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-const GAME_VERSION = "0.34";
+const GAME_VERSION = "0.35";
 let activeTab = "player";
 let currentZone = "Temporal Rift";
 let currentDifficulty = "Normal";
@@ -638,6 +636,7 @@ let enemies = [];
 let pendingRespawns = [];
 let joystick = { active:false, dx:0, dy:0, id:null };
 let introDone = false;
+let spawnBossExitPortal = false;
 
 const potionIcon = `
 <svg viewBox="0 0 32 32" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
@@ -794,13 +793,8 @@ class Player{
   onDeath(){
     this.hp = this.maxHP;
     this.sp = this.maxSP;
-    if(currentZone === "Cave of Memories" || currentZone === "Cave of Memories Boss"){
-      this.x = 40;
-      this.y = canvas.height * 0.72;
-    } else {
-      this.x = 90;
-      this.y = 126;
-    }
+    this.x = 90;
+    this.y = 126;
     updateHud();
     saveGame();
   }
@@ -981,8 +975,6 @@ function createYamanaka(){
     }
   });
 }
-
-let spawnBossExitPortal = false;
 
 function seedInitialData(){
   if(Object.keys(inventory.items).length === 0){
@@ -1213,7 +1205,6 @@ function useInventoryItem(itemName){
 }
 
 function performBasicAttack(){
-  let hit = false;
   enemies.forEach(enemy => {
     const dx = (enemy.x + enemy.w/2) - (player.x + player.w/2);
     const dy = (enemy.y + enemy.h/2) - (player.y + player.h/2);
@@ -1221,13 +1212,8 @@ function performBasicAttack(){
     if(dist <= 34){
       const damage = Math.max(1, Math.floor(player.getAttack() / 1000));
       enemy.takeHit(damage);
-      hit = true;
     }
   });
-
-  if(!hit){
-    // intentionally no log spam
-  }
   saveGame();
 }
 
@@ -1562,14 +1548,17 @@ function handleRespawns(){
 }
 
 function update(){
-  if(menuPanel.style.display !== "none" || dungeonPanel.style.display !== "none") return;
+  const blocking = (
+    menuPanel.style.display !== "none" ||
+    dungeonPanel.style.display !== "none"
+  );
 
-  if(joystick.dx !== 0 || joystick.dy !== 0){
+  if(!blocking){
     player.move(joystick.dx, joystick.dy);
+    enemies.forEach(enemy => enemy.update());
+    handleRespawns();
   }
 
-  enemies.forEach(enemy => enemy.update());
-  handleRespawns();
   updateHud();
 }
 
@@ -1623,17 +1612,18 @@ joyArea.addEventListener("touchstart", (e) => {
   joystick.active = true;
   joystick.id = t.identifier;
   updateJoystick(t.clientX, t.clientY);
-}, { passive:true });
+}, { passive:false });
 
-document.addEventListener("touchmove", (e) => {
+joyArea.addEventListener("touchmove", (e) => {
   if(!joystick.active) return;
   for(const t of e.changedTouches){
     if(t.identifier === joystick.id){
+      e.preventDefault();
       updateJoystick(t.clientX, t.clientY);
       break;
     }
   }
-}, { passive:true });
+}, { passive:false });
 
 function endJoystickTouch(e){
   if(!joystick.active) return;
@@ -1649,12 +1639,17 @@ function endJoystickTouch(e){
   }
 }
 
-document.addEventListener("touchend", endJoystickTouch, { passive:true });
-document.addEventListener("touchcancel", endJoystickTouch, { passive:true });
+joyArea.addEventListener("touchend", endJoystickTouch, { passive:false });
+joyArea.addEventListener("touchcancel", endJoystickTouch, { passive:false });
 
 function bindTap(el, fn){
-  el.addEventListener("touchstart", () => fn(), { passive:true });
-  el.addEventListener("click", () => fn());
+  el.addEventListener("touchstart", (e) => {
+    fn();
+  }, { passive:true });
+
+  el.addEventListener("click", () => {
+    fn();
+  });
 }
 
 bindTap(menuBtn, () => {
@@ -1715,7 +1710,7 @@ if(!loadGame()){
   renderItemDisplay();
 }
 
-logMessage("Onigiri 2 v0.34 loaded.");
+logMessage("Onigiri 2 v0.35 loaded.");
 loop();
 </script>
 </body>
