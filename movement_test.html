@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Movement Test</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #111;
+    touch-action: none;
+    font-family: Arial, sans-serif;
+  }
+
+  #game {
+    position: absolute;
+    inset: 0;
+    background: #222;
+  }
+
+  #joystickArea {
+    position: absolute;
+    left: 24px;
+    bottom: 24px;
+    width: 140px;
+    height: 140px;
+    touch-action: none;
+  }
+
+  #joyBase {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    border: 2px solid rgba(255,255,255,0.18);
+  }
+
+  #joyStick {
+    position: absolute;
+    left: 48px;
+    top: 48px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #f7b6d2;
+    border: 2px solid #fff;
+  }
+
+  #label {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    color: white;
+    background: rgba(0,0,0,0.4);
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="label">Use the joystick</div>
+
+<div id="joystickArea">
+  <div id="joyBase"></div>
+  <div id="joyStick"></div>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const joyArea = document.getElementById("joystickArea");
+const joyStick = document.getElementById("joyStick");
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+const player = {
+  x: 220,
+  y: 220,
+  w: 36,
+  h: 36,
+  speed: 3
+};
+
+const joystick = {
+  active: false,
+  dx: 0,
+  dy: 0,
+  id: null
+};
+
+function resetJoystickVisual() {
+  joyStick.style.left = "48px";
+  joyStick.style.top = "48px";
+}
+
+function updateJoystick(clientX, clientY) {
+  const rect = joyArea.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  let dx = clientX - cx;
+  let dy = clientY - cy;
+
+  const max = 42;
+  const dist = Math.hypot(dx, dy);
+
+  if (dist > max) {
+    dx = dx / dist * max;
+    dy = dy / dist * max;
+  }
+
+  joystick.dx = dx / max;
+  joystick.dy = dy / max;
+
+  joyStick.style.left = (48 + dx) + "px";
+  joyStick.style.top = (48 + dy) + "px";
+}
+
+joyArea.addEventListener("touchstart", (e) => {
+  const t = e.changedTouches[0];
+  joystick.active = true;
+  joystick.id = t.identifier;
+  updateJoystick(t.clientX, t.clientY);
+}, { passive: false });
+
+joyArea.addEventListener("touchmove", (e) => {
+  if (!joystick.active) return;
+  for (const t of e.changedTouches) {
+    if (t.identifier === joystick.id) {
+      e.preventDefault();
+      updateJoystick(t.clientX, t.clientY);
+      break;
+    }
+  }
+}, { passive: false });
+
+function endJoystickTouch(e) {
+  if (!joystick.active) return;
+  for (const t of e.changedTouches) {
+    if (t.identifier === joystick.id) {
+      joystick.active = false;
+      joystick.id = null;
+      joystick.dx = 0;
+      joystick.dy = 0;
+      resetJoystickVisual();
+      break;
+    }
+  }
+}
+
+joyArea.addEventListener("touchend", endJoystickTouch, { passive: false });
+joyArea.addEventListener("touchcancel", endJoystickTouch, { passive: false });
+
+function update() {
+  player.x += joystick.dx * player.speed;
+  player.y += joystick.dy * player.speed;
+
+  if (player.x < 0) player.x = 0;
+  if (player.y < 0) player.y = 0;
+  if (player.x > canvas.width - player.w) player.x = canvas.width - player.w;
+  if (player.y > canvas.height - player.h) player.y = canvas.height - player.h;
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "#3a3a3a";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "#79c4ff";
+  ctx.fillRect(player.x, player.y, player.w, player.h);
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+</body>
+</html>
