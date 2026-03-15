@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Onigiri 2 v0.35</title>
+<title>Onigiri 2 v0.40</title>
 <style>
   :root{
     --shell-pink-1:#f7dce7;
@@ -11,7 +11,7 @@
     --shell-line:#c990a9;
     --screen-border:#e6bfd1;
 
-    --hud-bg:rgba(12,12,16,0.50);
+    --hud-bg:rgba(12,12,16,0.52);
     --hp:#d4587a;
     --sp:#6eaef5;
 
@@ -114,7 +114,7 @@
     position:absolute;
     left:6px;
     top:6px;
-    width:118px;
+    width:120px;
     padding:5px 6px;
     border-radius:9px;
     background:var(--hud-bg);
@@ -202,7 +202,7 @@
     width:28px;
     height:28px;
     border-radius:8px;
-    background:rgba(18,18,24,0.52);
+    background:rgba(18,18,24,0.56);
     border:1px solid rgba(255,255,255,0.16);
     display:flex;
     align-items:center;
@@ -271,6 +271,7 @@
     bottom:138px;
     width:128px;
     height:128px;
+    touch-action:none;
   }
 
   #joyBase{
@@ -626,7 +627,7 @@ function resizeCanvas(){
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-const GAME_VERSION = "0.35";
+const GAME_VERSION = "0.40";
 let activeTab = "player";
 let currentZone = "Temporal Rift";
 let currentDifficulty = "Normal";
@@ -634,9 +635,15 @@ let messages = [];
 let zoneToastTimer = null;
 let enemies = [];
 let pendingRespawns = [];
-let joystick = { active:false, dx:0, dy:0, id:null };
 let introDone = false;
 let spawnBossExitPortal = false;
+
+const joystick = {
+  active:false,
+  dx:0,
+  dy:0,
+  id:null
+};
 
 const potionIcon = `
 <svg viewBox="0 0 32 32" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
@@ -664,7 +671,9 @@ function logMessage(text){
   infoBar.innerHTML = messages.join("<br>");
 }
 
-function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+function clamp(v,min,max){
+  return Math.max(min, Math.min(max, v));
+}
 
 const ItemDatabase = {
   "Potion": { type:"consumable", healHP:50, icon:potionIcon },
@@ -682,6 +691,7 @@ class InventorySystem{
     this.items = {};
     this.maxStack = 9999;
   }
+
   addItem(name, qty=1){
     const cur = this.items[name] || 0;
     this.items[name] = clamp(cur + qty, 0, this.maxStack);
@@ -690,6 +700,7 @@ class InventorySystem{
     renderItemDisplay();
     saveGame();
   }
+
   removeItem(name, qty=1){
     if(!this.items[name]) return false;
     this.items[name] -= qty;
@@ -699,6 +710,7 @@ class InventorySystem{
     saveGame();
     return true;
   }
+
   getSortedItems(){
     return Object.keys(this.items).sort((a,b) => a.localeCompare(b));
   }
@@ -711,17 +723,21 @@ class EquipmentSystem{
     this.magatama = [null,null,null,null];
     this.activeWeaponIndex = 0;
   }
+
   getActiveWeapon(){
     return this.weapons[this.activeWeaponIndex];
   }
+
   equipWeapon(itemName){
     const data = ItemDatabase[itemName];
     if(!data || data.type !== "weapon") return false;
+
     const empty = this.weapons.findIndex(w => w === null);
     if(empty === -1){
       logMessage("No empty weapon slot.");
       return false;
     }
+
     this.weapons[empty] = JSON.parse(JSON.stringify({
       name:itemName,
       weaponClass:data.weaponClass,
@@ -729,6 +745,7 @@ class EquipmentSystem{
       skills:data.skills || ["","",""],
       ougies:data.ougies || ["",""]
     }));
+
     inventory.removeItem(itemName,1);
     logMessage(itemName + " equipped.");
     updateButtons();
@@ -737,10 +754,12 @@ class EquipmentSystem{
     saveGame();
     return true;
   }
+
   getTotalAttack(){
     const active = this.getActiveWeapon();
     return active ? active.attack : 0;
   }
+
   getTotalDefense(){
     return 1000;
   }
@@ -768,28 +787,34 @@ class Player{
     this.selectedQuickItem = 0;
     this.livesInDungeon = 4;
   }
+
   getAttack(){
     return this.attackBase + equipment.getTotalAttack();
   }
+
   getDefense(){
     return this.defenseBase + equipment.getTotalDefense();
   }
+
   move(dx,dy){
     this.x += dx * this.moveSpeed;
     this.y += dy * this.moveSpeed;
     this.x = clamp(this.x, 0, canvas.width - this.w);
     this.y = clamp(this.y, 0, canvas.height - this.h);
   }
+
   heal(amount){
     this.hp = clamp(this.hp + amount, 0, this.maxHP);
     updateHud();
   }
+
   takeDamage(amount){
     this.hp -= amount;
     if(this.hp < 0) this.hp = 0;
     updateHud();
     if(this.hp <= 0) this.onDeath();
   }
+
   onDeath(){
     this.hp = this.maxHP;
     this.sp = this.maxSP;
@@ -798,12 +823,14 @@ class Player{
     updateHud();
     saveGame();
   }
+
   useSelectedItem(){
     const itemName = this.quickItems[this.selectedQuickItem];
     if(!itemName){
       logMessage("No item selected.");
       return;
     }
+
     const data = ItemDatabase[itemName];
     if(!data || !inventory.items[itemName]){
       logMessage("That item is unavailable.");
@@ -812,6 +839,7 @@ class Player{
       saveGame();
       return;
     }
+
     if(data.type === "consumable"){
       if(data.healHP){
         this.heal(data.healHP);
@@ -821,6 +849,7 @@ class Player{
     } else {
       logMessage("That item cannot be used here yet.");
     }
+
     renderItemDisplay();
     saveGame();
   }
@@ -903,6 +932,7 @@ class Enemy{
 
   die(){
     if(this.onDeathDrop) this.onDeathDrop(this);
+
     if(this.isFieldMob){
       pendingRespawns.push({
         type:this.type,
@@ -911,6 +941,7 @@ class Enemy{
         time:Date.now() + this.respawnMs
       });
     }
+
     enemies = enemies.filter(e => e !== this);
   }
 
@@ -1066,6 +1097,7 @@ function renderItemDisplay(){
     const slot = document.createElement("div");
     slot.className = "item-display-slot" + (player.selectedQuickItem === i ? " selected" : "");
     const itemName = player.quickItems[i];
+
     if(itemName){
       const data = ItemDatabase[itemName];
       if(data?.icon){
@@ -1080,6 +1112,7 @@ function renderItemDisplay(){
       count.textContent = inventory.items[itemName] || 0;
       slot.appendChild(count);
     }
+
     itemDisplayUI.appendChild(slot);
   }
 }
@@ -1171,6 +1204,7 @@ function addToQuickBar(itemName){
     logMessage("Only recovery/boost items go there.");
     return;
   }
+
   const empty = player.quickItems.findIndex(s => s === null);
   if(empty === -1) player.quickItems[player.selectedQuickItem] = itemName;
   else player.quickItems[empty] = itemName;
@@ -1189,6 +1223,7 @@ function tryEquipItem(itemName){
 function useInventoryItem(itemName){
   const data = ItemDatabase[itemName];
   if(!data) return;
+
   if(data.type === "consumable"){
     if(data.healHP){
       player.heal(data.healHP);
@@ -1200,6 +1235,7 @@ function useInventoryItem(itemName){
   } else {
     logMessage(itemName + " cannot be used yet.");
   }
+
   renderMenu();
   saveGame();
 }
@@ -1539,9 +1575,11 @@ function drawPlayer(){
 
 function handleRespawns(){
   if(currentZone !== "Dimension of Memories") return;
+
   const now = Date.now();
   const ready = pendingRespawns.filter(r => r.time <= now);
   pendingRespawns = pendingRespawns.filter(r => r.time > now);
+
   ready.forEach(r => {
     enemies.push(createFamiliarDaruma(r.x, r.y));
   });
@@ -1592,6 +1630,7 @@ function updateJoystick(clientX, clientY){
 
   let dx = clientX - cx;
   let dy = clientY - cy;
+
   const max = 34;
   const dist = Math.hypot(dx, dy);
 
@@ -1643,7 +1682,7 @@ joyArea.addEventListener("touchend", endJoystickTouch, { passive:false });
 joyArea.addEventListener("touchcancel", endJoystickTouch, { passive:false });
 
 function bindTap(el, fn){
-  el.addEventListener("touchstart", (e) => {
+  el.addEventListener("touchstart", () => {
     fn();
   }, { passive:true });
 
@@ -1710,7 +1749,7 @@ if(!loadGame()){
   renderItemDisplay();
 }
 
-logMessage("Onigiri 2 v0.35 loaded.");
+logMessage("Onigiri 2 v0.40 loaded.");
 loop();
 </script>
 </body>
