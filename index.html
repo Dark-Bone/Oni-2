@@ -1,359 +1,1246 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Onigiri 2 v0.43</title>
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Onigiri 2 v0.50 Stable Rebuild</title>
 <style>
+  :root{
+    --shell-pink-1:#f7dce7;
+    --shell-pink-2:#efc8d7;
+    --shell-line:#c990a9;
+    --screen-border:#e6bfd1;
+    --hud-bg:rgba(12,12,16,0.52);
+    --hp:#d4587a;
+    --sp:#6eaef5;
+    --attack:#c8a07d;
+    --skill:#f2d257;
+    --ougie:#f3a44e;
+    --item:#8fd86b;
+    --talk:#64a8ff;
+  }
 
-html,body{
-margin:0;
-padding:0;
-width:100%;
-height:100%;
-overflow:hidden;
-background:#1a1a1a;
-touch-action:none;
-font-family:sans-serif;
-}
+  *{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+  }
 
-#gameCanvas{
-position:absolute;
-width:100%;
-height:100%;
-background:#111;
-}
+  html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:linear-gradient(180deg,#bfdcf6 0%, #d8ecff 100%);
+    touch-action:none;
+    font-family:Arial,sans-serif;
+  }
 
-#joystick{
-position:absolute;
-left:30px;
-bottom:40px;
-width:140px;
-height:140px;
-border-radius:50%;
-background:rgba(255,255,255,0.15);
-}
+  #app{
+    position:relative;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+  }
 
-#stick{
-position:absolute;
-left:48px;
-top:48px;
-width:44px;
-height:44px;
-border-radius:50%;
-background:#ffb6d9;
-}
+  #deviceShell{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:min(86vw,390px);
+    height:min(92vh,820px);
+    border-radius:34px;
+    background:linear-gradient(180deg,var(--shell-pink-1),var(--shell-pink-2));
+    border:2px solid var(--shell-line);
+    box-shadow:
+      0 16px 34px rgba(0,0,0,0.16),
+      inset 0 2px 0 rgba(255,255,255,0.7),
+      inset 0 -6px 18px rgba(178,113,140,0.16);
+    overflow:hidden;
+  }
 
-#attackBtn{
-position:absolute;
-right:40px;
-bottom:120px;
-width:72px;
-height:72px;
-border-radius:50%;
-background:#c8a07d;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:bold;
-font-size:18px;
-}
+  #speakerTop{
+    position:absolute;
+    top:14px;
+    left:50%;
+    transform:translateX(-50%);
+    width:100px;
+    height:10px;
+    border-radius:8px;
+    background:rgba(78,38,56,0.16);
+  }
 
-#itemBar{
-position:absolute;
-right:10px;
-bottom:10px;
-display:flex;
-gap:6px;
-}
+  #screenFrame{
+    position:absolute;
+    left:20px;
+    right:20px;
+    top:38px;
+    height:53%;
+    border-radius:18px;
+    background:linear-gradient(180deg,#f5e7ee,#ebd1dc);
+    border:2px solid var(--screen-border);
+    box-shadow: inset 0 0 0 3px rgba(255,255,255,0.35);
+    padding:8px;
+  }
 
-.itemSlot{
-width:28px;
-height:28px;
-border-radius:6px;
-background:#333;
-border:1px solid #777;
-}
+  #gameViewport{
+    position:relative;
+    width:100%;
+    height:100%;
+    border-radius:12px;
+    overflow:hidden;
+    background:#111;
+    border:1px solid rgba(80,40,60,0.25);
+  }
 
-#info{
-position:absolute;
-left:10px;
-bottom:10px;
-color:white;
-font-size:12px;
-background:rgba(0,0,0,0.4);
-padding:4px 6px;
-border-radius:6px;
-}
+  canvas{
+    display:block;
+    width:100%;
+    height:100%;
+    background:#111;
+  }
 
-#build{
-position:absolute;
-top:8px;
-right:8px;
-font-size:10px;
-color:white;
-background:rgba(0,0,0,0.5);
-padding:3px 5px;
-border-radius:6px;
-}
+  #screenUI{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+  }
 
+  #compactHud{
+    position:absolute;
+    left:6px;
+    top:6px;
+    width:122px;
+    padding:5px 6px;
+    border-radius:9px;
+    background:var(--hud-bg);
+    color:#fff;
+    font-size:9px;
+  }
+
+  .compact-line{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:2px;
+  }
+
+  .mini-bar{
+    width:100%;
+    height:6px;
+    border-radius:999px;
+    overflow:hidden;
+    background:rgba(255,255,255,0.12);
+    margin-bottom:3px;
+  }
+
+  .mini-fill{
+    height:100%;
+    width:100%;
+  }
+
+  #hpFill{ background:var(--hp); }
+  #spFill{ background:var(--sp); }
+
+  #miniStats{
+    color:#e6d6e3;
+    font-size:8px;
+  }
+
+  #zoneToast{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+    min-width:90px;
+    max-width:60%;
+    text-align:center;
+    padding:4px 8px;
+    border-radius:999px;
+    background:rgba(14,14,18,0.58);
+    color:#fff;
+    font-size:10px;
+  }
+
+  #infoBar{
+    position:absolute;
+    left:6px;
+    bottom:6px;
+    width:44%;
+    max-height:56px;
+    overflow:hidden;
+    border-radius:9px;
+    background:rgba(10,10,14,0.40);
+    color:#fff;
+    padding:5px 7px;
+    font-size:8px;
+    line-height:1.25;
+  }
+
+  #itemDisplayUI{
+    position:absolute;
+    right:6px;
+    bottom:6px;
+    width:166px;
+    display:flex;
+    justify-content:flex-end;
+    gap:3px;
+  }
+
+  .item-display-slot{
+    width:28px;
+    height:28px;
+    border-radius:8px;
+    background:rgba(18,18,24,0.56);
+    border:1px solid rgba(255,255,255,0.16);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+    color:#fff;
+    font-size:10px;
+  }
+
+  .item-display-slot.selected{
+    outline:2px solid rgba(255,255,255,0.72);
+  }
+
+  .item-count{
+    position:absolute;
+    right:1px;
+    bottom:1px;
+    font-size:7px;
+    color:#fff;
+    background:rgba(0,0,0,0.45);
+    padding:0 2px;
+    border-radius:4px;
+  }
+
+  #controlsArea{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    top:calc(53% + 54px);
+  }
+
+  #itemControlRow{
+    position:absolute;
+    left:20px;
+    bottom:284px;
+    width:150px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  .item-control-btn{
+    border:none;
+    border-radius:999px;
+    height:34px;
+    color:#734558;
+    font-weight:bold;
+    background:linear-gradient(180deg,#f8eef2,#debfcd);
+    border:1px solid #b98ca0;
+    box-shadow:0 3px 6px rgba(0,0,0,0.1);
+  }
+
+  #itemLeftBtn, #itemRightBtn{
+    width:40px;
+    font-size:18px;
+  }
+
+  #itemCenterBtn{
+    width:58px;
+    font-size:11px;
+  }
+
+  #joystickArea{
+    position:absolute;
+    left:28px;
+    bottom:138px;
+    width:128px;
+    height:128px;
+    touch-action:none;
+  }
+
+  #joyBase{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff6fa, #dfc2cf);
+    border:1px solid #b98ca0;
+    box-shadow:0 4px 8px rgba(0,0,0,0.12);
+  }
+
+  #joyInnerRing{
+    position:absolute;
+    left:18px;
+    top:18px;
+    width:92px;
+    height:92px;
+    border-radius:50%;
+    border:1px solid rgba(121,76,96,0.18);
+    background:rgba(255,255,255,0.18);
+  }
+
+  #joyStick{
+    position:absolute;
+    left:42px;
+    top:42px;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff, #d7b6c5);
+    border:1px solid #ad7d93;
+    box-shadow:0 3px 8px rgba(0,0,0,0.14);
+  }
+
+  #rightCluster{
+    position:absolute;
+    right:30px;
+    bottom:62px;
+    width:142px;
+    height:286px;
+  }
+
+  .shell-btn{
+    position:absolute;
+    border:none;
+    color:#fff;
+    font-weight:bold;
+    box-shadow:
+      0 5px 9px rgba(0,0,0,0.16),
+      inset 0 2px 0 rgba(255,255,255,0.28);
+  }
+
+  .shell-btn:active{
+    transform:scale(0.97);
+  }
+
+  .stack-btn{
+    left:32px;
+    width:78px;
+    height:34px;
+    border-radius:999px;
+    font-size:13px;
+  }
+
+  #attackBtn{
+    top:20px;
+    background:radial-gradient(circle at 30% 30%, #e2c5a8, var(--attack));
+    color:#5d3e24;
+  }
+
+  .skill-btn{
+    background:radial-gradient(circle at 30% 30%, #fff0a6, var(--skill));
+    color:#6d5310;
+  }
+
+  .ougie-btn{
+    background:radial-gradient(circle at 30% 30%, #ffd09d, var(--ougie));
+    color:#7b4311;
+  }
+
+  #skill1{ top:60px; }
+  #skill2{ top:98px; }
+  #skill3{ top:136px; }
+  #ougie1{ top:174px; }
+  #ougie2{ top:212px; }
+
+  #talkBtn{
+    right:0;
+    top:118px;
+    width:52px;
+    height:52px;
+    border-radius:999px;
+    background:radial-gradient(circle at 30% 30%, #b6d8ff, var(--talk));
+    color:#173b6c;
+    font-size:11px;
+  }
+
+  #itemUseBtn{
+    right:0;
+    top:178px;
+    width:54px;
+    height:54px;
+    border-radius:999px;
+    background:radial-gradient(circle at 30% 30%, #c9f8b1, var(--item));
+    color:#29551a;
+    font-size:11px;
+  }
+
+  #menuBtn{
+    position:absolute;
+    left:50%;
+    bottom:24px;
+    transform:translateX(-50%);
+    width:72px;
+    height:30px;
+    border-radius:999px;
+    border:none;
+    background:linear-gradient(180deg,#f8eef2,#debfcd);
+    border:1px solid #b98ca0;
+    color:#734558;
+    font-size:11px;
+    font-weight:bold;
+    box-shadow:0 3px 6px rgba(0,0,0,0.1);
+    z-index:130;
+  }
+
+  #menuPanel, #dungeonPanel{
+    position:absolute;
+    inset:14px;
+    border-radius:16px;
+    background:rgba(24,19,25,0.97);
+    border:1px solid rgba(255,255,255,0.14);
+    display:none;
+    z-index:100;
+    color:#fff;
+    overflow:hidden;
+  }
+
+  #menuHeader{
+    display:flex;
+    height:40px;
+    background:#372a35;
+  }
+
+  .tabBtn{
+    flex:1;
+    border:none;
+    background:#4b3946;
+    color:#fff;
+    font-weight:bold;
+    font-size:12px;
+  }
+
+  .tabBtn.active{
+    background:#705164;
+  }
+
+  #menuContent{
+    padding:10px;
+    height:calc(100% - 40px);
+    overflow:auto;
+    font-size:12px;
+  }
+
+  #dungeonPanel{
+    inset:auto 22px 92px 22px;
+    height:188px;
+    padding:14px;
+    z-index:120;
+  }
+
+  #dungeonTitle{
+    font-size:16px;
+    font-weight:bold;
+    margin-bottom:8px;
+  }
+
+  #dungeonText{
+    font-size:11px;
+    color:#d9ccda;
+    margin-bottom:12px;
+  }
+
+  .dungeon-btn{
+    width:100%;
+    height:34px;
+    border:none;
+    border-radius:10px;
+    margin-bottom:8px;
+    background:#8d6074;
+    color:#fff;
+    font-weight:bold;
+  }
+
+  .row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+    background:rgba(255,255,255,0.06);
+    border-radius:10px;
+    padding:8px;
+    margin-bottom:6px;
+  }
+
+  .small-btn{
+    border:none;
+    background:#8d6074;
+    color:#fff;
+    border-radius:8px;
+    padding:5px 8px;
+    font-size:10px;
+  }
+
+  .subtle{
+    color:#d9ccda;
+    font-size:10px;
+  }
 </style>
 </head>
-
 <body>
+<div id="app">
+  <div id="deviceShell">
+    <div id="speakerTop"></div>
 
-<canvas id="gameCanvas"></canvas>
+    <div id="screenFrame">
+      <div id="gameViewport">
+        <canvas id="game"></canvas>
 
-<div id="joystick">
-<div id="stick"></div>
+        <div id="screenUI">
+          <div id="compactHud">
+            <div class="compact-line"><span>HP</span><span id="hpText">100/100</span></div>
+            <div class="mini-bar"><div id="hpFill" class="mini-fill"></div></div>
+
+            <div class="compact-line"><span>SP</span><span id="spText">100/100</span></div>
+            <div class="mini-bar"><div id="spFill" class="mini-fill"></div></div>
+
+            <div id="miniStats">ATK 1000 | DEF 1000</div>
+          </div>
+
+          <div id="zoneToast">Temporal Rift</div>
+          <div id="infoBar"></div>
+          <div id="itemDisplayUI"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="controlsArea">
+      <div id="itemControlRow">
+        <button id="itemLeftBtn" class="item-control-btn">←</button>
+        <button id="itemCenterBtn" class="item-control-btn">ITEM</button>
+        <button id="itemRightBtn" class="item-control-btn">→</button>
+      </div>
+
+      <div id="joystickArea">
+        <div id="joyBase"></div>
+        <div id="joyInnerRing"></div>
+        <div id="joyStick"></div>
+      </div>
+
+      <div id="rightCluster">
+        <button id="attackBtn" class="shell-btn stack-btn">ATK</button>
+        <button id="skill1" class="shell-btn stack-btn skill-btn">S1</button>
+        <button id="skill2" class="shell-btn stack-btn skill-btn">S2</button>
+        <button id="skill3" class="shell-btn stack-btn skill-btn">S3</button>
+        <button id="ougie1" class="shell-btn stack-btn ougie-btn">O1</button>
+        <button id="ougie2" class="shell-btn stack-btn ougie-btn">O2</button>
+
+        <button id="talkBtn" class="shell-btn">TALK</button>
+        <button id="itemUseBtn" class="shell-btn">USE</button>
+      </div>
+
+      <button id="menuBtn">MENU</button>
+    </div>
+
+    <div id="menuPanel">
+      <div id="menuHeader">
+        <button class="tabBtn active" data-tab="player">Player</button>
+        <button class="tabBtn" data-tab="inventory">Inventory</button>
+      </div>
+      <div id="menuContent"></div>
+    </div>
+
+    <div id="dungeonPanel">
+      <div id="dungeonTitle">Enter Cave of Memories?</div>
+      <div id="dungeonText">Select difficulty.</div>
+      <button id="normalBtn" class="dungeon-btn">Normal</button>
+      <button id="hardBtn" class="dungeon-btn">Hard</button>
+      <button id="hellBtn" class="dungeon-btn">Hell</button>
+      <button id="cancelDungeonBtn" class="dungeon-btn">Cancel</button>
+    </div>
+  </div>
 </div>
-
-<div id="attackBtn">ATK</div>
-
-<div id="itemBar">
-<div class="itemSlot"></div>
-<div class="itemSlot"></div>
-<div class="itemSlot"></div>
-<div class="itemSlot"></div>
-<div class="itemSlot"></div>
-</div>
-
-<div id="info">Temporal Rift</div>
-<div id="build">v0.43</div>
 
 <script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const viewport = document.getElementById("gameViewport");
 
-const canvas = document.getElementById("gameCanvas")
-const ctx = canvas.getContext("2d")
+const hpText = document.getElementById("hpText");
+const spText = document.getElementById("spText");
+const hpFill = document.getElementById("hpFill");
+const spFill = document.getElementById("spFill");
+const miniStats = document.getElementById("miniStats");
+const infoBar = document.getElementById("infoBar");
+const zoneToast = document.getElementById("zoneToast");
+const itemDisplayUI = document.getElementById("itemDisplayUI");
 
-function resize(){
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
+const menuPanel = document.getElementById("menuPanel");
+const menuBtn = document.getElementById("menuBtn");
+const menuContent = document.getElementById("menuContent");
+const tabButtons = document.querySelectorAll(".tabBtn");
+
+const dungeonPanel = document.getElementById("dungeonPanel");
+const normalBtn = document.getElementById("normalBtn");
+const hardBtn = document.getElementById("hardBtn");
+const hellBtn = document.getElementById("hellBtn");
+const cancelDungeonBtn = document.getElementById("cancelDungeonBtn");
+
+const attackBtn = document.getElementById("attackBtn");
+const talkBtn = document.getElementById("talkBtn");
+const itemUseBtn = document.getElementById("itemUseBtn");
+const itemLeftBtn = document.getElementById("itemLeftBtn");
+const itemRightBtn = document.getElementById("itemRightBtn");
+const itemCenterBtn = document.getElementById("itemCenterBtn");
+
+const joyArea = document.getElementById("joystickArea");
+const joyStick = document.getElementById("joyStick");
+
+function resizeCanvas(){
+  canvas.width = viewport.clientWidth;
+  canvas.height = viewport.clientHeight;
 }
-resize()
-window.addEventListener("resize",resize)
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-const player={
-x:120,
-y:200,
-size:30,
-speed:3
-}
+const potionIcon = `
+<svg viewBox="0 0 32 32" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+  <rect x="12" y="3" width="8" height="5" rx="1.5" fill="#d9eef7"/>
+  <rect x="11" y="7" width="10" height="4" rx="1.5" fill="#b9d8e6"/>
+  <path d="M10 11h12c2 0 4 2 4 5v1c0 6-5 10-10 10s-10-4-10-10v-1c0-3 2-5 4-5z" fill="#ff8aa6"/>
+  <path d="M10 18c2 2 10 2 12-2 1 5-3 11-10 11-4 0-8-3-9-8 2 1 4 1 7-1z" fill="#d84f78"/>
+  <ellipse cx="14" cy="16" rx="2" ry="3" fill="rgba(255,255,255,0.35)"/>
+</svg>`;
 
-let joystick={dx:0,dy:0,id:null}
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
-const joy=document.getElementById("joystick")
-const stick=document.getElementById("stick")
-
-function updateStick(x,y){
-const r=joy.getBoundingClientRect()
-const cx=r.left+r.width/2
-const cy=r.top+r.height/2
-let dx=x-cx
-let dy=y-cy
-const max=42
-const d=Math.hypot(dx,dy)
-if(d>max){dx=dx/d*max;dy=dy/d*max}
-joystick.dx=dx/max
-joystick.dy=dy/max
-stick.style.left=(48+dx)+"px"
-stick.style.top=(48+dy)+"px"
-}
-
-function resetStick(){
-stick.style.left="48px"
-stick.style.top="48px"
-joystick.dx=0
-joystick.dy=0
-}
-
-joy.addEventListener("touchstart",e=>{
-const t=e.changedTouches[0]
-joystick.id=t.identifier
-updateStick(t.clientX,t.clientY)
-},{passive:false})
-
-joy.addEventListener("touchmove",e=>{
-for(const t of e.changedTouches){
-if(t.identifier===joystick.id){
-updateStick(t.clientX,t.clientY)
-}
-}
-},{passive:false})
-
-joy.addEventListener("touchend",resetStick)
-
-document.getElementById("attackBtn").addEventListener("touchstart",attack)
-
-let attackFlash=0
-
-function attack(){
-
-attackFlash=8
-
-for(const mob of mobs){
-
-if(!mob.alive) continue
-
-const dist=Math.hypot(player.x-mob.x,player.y-mob.y)
-
-if(dist<70){
-mob.hp--
-if(mob.hp<=0){
-mob.alive=false
-spawnDrop(mob.x,mob.y)
-mob.respawn=300
-}
+let messages = [];
+function logMessage(text){
+  messages.unshift(text);
+  messages = messages.slice(0,5);
+  infoBar.innerHTML = messages.join("<br>");
 }
 
+let currentZone = "Temporal Rift";
+let currentDifficulty = "Normal";
+let attackFlash = 0;
+let pendingRespawns = [];
+let groundDrops = [];
+let enemies = [];
+let spawnBossExitPortal = false;
+
+const joystick = {
+  active:false,
+  dx:0,
+  dy:0,
+  id:null
+};
+
+const player = {
+  x: 140,
+  y: 210,
+  w: 18,
+  h: 22,
+  hp: 100,
+  maxHP: 100,
+  sp: 100,
+  maxSP: 100,
+  speed: 1.75,
+  quickItems: ["Potion", null, null, null, null],
+  selectedQuickItem: 0
+};
+
+const inventory = {
+  "Potion": 5,
+  "Familiar Fragments": 0,
+  "Familiar Sword": 1
+};
+
+function updateHud(){
+  hpText.textContent = `${Math.floor(player.hp)}/${player.maxHP}`;
+  spText.textContent = `${Math.floor(player.sp)}/${player.maxSP}`;
+  hpFill.style.width = `${(player.hp/player.maxHP)*100}%`;
+  spFill.style.width = `${(player.sp/player.maxSP)*100}%`;
+  miniStats.textContent = `ATK 1000 | DEF 1000`;
+  zoneToast.textContent = currentZone;
 }
 
+function renderItemDisplay(){
+  itemDisplayUI.innerHTML = "";
+  for(let i=0;i<5;i++){
+    const slot = document.createElement("div");
+    slot.className = "item-display-slot" + (player.selectedQuickItem === i ? " selected" : "");
+    const itemName = player.quickItems[i];
+    if(itemName){
+      if(itemName === "Potion"){
+        slot.innerHTML = potionIcon;
+      } else {
+        slot.textContent = "?";
+      }
+      const count = document.createElement("div");
+      count.className = "item-count";
+      count.textContent = inventory[itemName] || 0;
+      slot.appendChild(count);
+    }
+    itemDisplayUI.appendChild(slot);
+  }
 }
 
-const mobs=[]
-
-function spawnMob(x,y){
-mobs.push({
-x:x,
-y:y,
-size:28,
-hp:5,
-alive:true,
-wander:Math.random()*200
-})
+function cycleItemSelection(dir){
+  player.selectedQuickItem += dir;
+  if(player.selectedQuickItem < 0) player.selectedQuickItem = 4;
+  if(player.selectedQuickItem > 4) player.selectedQuickItem = 0;
+  renderItemDisplay();
 }
 
-spawnMob(400,200)
-spawnMob(450,260)
-spawnMob(350,240)
-
-const drops=[]
-
-function spawnDrop(x,y){
-
-if(Math.random()<0.5){
-
-drops.push({
-x:x,
-y:y,
-item:"Familiar Fragment"
-})
-
-document.getElementById("info").textContent="Familiar Fragment dropped"
-
+function useSelectedItem(){
+  const item = player.quickItems[player.selectedQuickItem];
+  if(item === "Potion" && (inventory["Potion"] || 0) > 0){
+    inventory["Potion"] -= 1;
+    player.hp = clamp(player.hp + 30, 0, player.maxHP);
+    logMessage("Used Potion");
+    renderItemDisplay();
+  } else {
+    logMessage("No item selected.");
+  }
 }
 
+function showZone(name){
+  currentZone = name;
+  zoneToast.textContent = name;
 }
 
-function updateMobs(){
-
-for(const m of mobs){
-
-if(!m.alive){
-m.respawn--
-if(m.respawn<=0){
-m.hp=5
-m.alive=true
-}
-continue
+function resetJoystickVisual(){
+  joyStick.style.left = "42px";
+  joyStick.style.top = "42px";
 }
 
-const dist=Math.hypot(player.x-m.x,player.y-m.y)
+function updateJoystick(clientX, clientY){
+  const rect = joyArea.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
 
-if(dist<160){
-m.x+=Math.sign(player.x-m.x)*0.6
-m.y+=Math.sign(player.y-m.y)*0.6
-}else{
-m.wander--
-if(m.wander<=0){
-m.dirX=Math.random()*2-1
-m.dirY=Math.random()*2-1
-m.wander=120
-}
-m.x+=m.dirX*0.4
-m.y+=m.dirY*0.4
-}
+  let dx = clientX - cx;
+  let dy = clientY - cy;
+  const max = 34;
+  const dist = Math.hypot(dx, dy);
 
-}
+  if(dist > max){
+    dx = dx / dist * max;
+    dy = dy / dist * max;
+  }
 
-}
-
-function updateDrops(){
-
-for(let i=drops.length-1;i>=0;i--){
-
-const d=drops[i]
-
-const dist=Math.hypot(player.x-d.x,player.y-d.y)
-
-if(dist<40){
-
-document.getElementById("info").textContent="Picked up Familiar Fragment"
-
-drops.splice(i,1)
-
+  joystick.dx = dx / max;
+  joystick.dy = dy / max;
+  joyStick.style.left = (42 + dx) + "px";
+  joyStick.style.top = (42 + dy) + "px";
 }
 
+joyArea.addEventListener("touchstart", (e) => {
+  const t = e.changedTouches[0];
+  joystick.active = true;
+  joystick.id = t.identifier;
+  updateJoystick(t.clientX, t.clientY);
+}, { passive:false });
+
+joyArea.addEventListener("touchmove", (e) => {
+  for(const t of e.changedTouches){
+    if(t.identifier === joystick.id){
+      e.preventDefault();
+      updateJoystick(t.clientX, t.clientY);
+      break;
+    }
+  }
+}, { passive:false });
+
+function endJoystickTouch(e){
+  for(const t of e.changedTouches){
+    if(t.identifier === joystick.id){
+      joystick.active = false;
+      joystick.id = null;
+      joystick.dx = 0;
+      joystick.dy = 0;
+      resetJoystickVisual();
+      break;
+    }
+  }
+}
+joyArea.addEventListener("touchend", endJoystickTouch, { passive:false });
+joyArea.addEventListener("touchcancel", endJoystickTouch, { passive:false });
+
+function bindTap(el, fn){
+  el.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    fn();
+  }, { passive:false });
+  el.addEventListener("click", fn);
 }
 
+bindTap(itemLeftBtn, () => cycleItemSelection(-1));
+bindTap(itemRightBtn, () => cycleItemSelection(1));
+bindTap(itemCenterBtn, useSelectedItem);
+bindTap(itemUseBtn, useSelectedItem);
+
+bindTap(menuBtn, () => {
+  if(dungeonPanel.style.display === "block") dungeonPanel.style.display = "none";
+  menuPanel.style.display = menuPanel.style.display === "none" ? "block" : "none";
+  renderMenu();
+});
+
+tabButtons.forEach(btn => {
+  bindTap(btn, () => {
+    tabButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderMenu(btn.dataset.tab);
+  });
+});
+
+bindTap(normalBtn, () => {
+  currentDifficulty = "Normal";
+  dungeonPanel.style.display = "none";
+  enterCaveOfMemories();
+});
+bindTap(hardBtn, () => {
+  currentDifficulty = "Hard";
+  dungeonPanel.style.display = "none";
+  enterCaveOfMemories();
+});
+bindTap(hellBtn, () => {
+  currentDifficulty = "Hell";
+  dungeonPanel.style.display = "none";
+  enterCaveOfMemories();
+});
+bindTap(cancelDungeonBtn, () => {
+  dungeonPanel.style.display = "none";
+});
+
+function renderMenu(tab="player"){
+  menuContent.innerHTML = "";
+  if(tab === "player"){
+    menuContent.innerHTML = `
+      <div class="row"><div><strong>Zone</strong><div class="subtle">${currentZone}</div></div></div>
+      <div class="row"><div><strong>HP</strong><div class="subtle">${player.hp}/${player.maxHP}</div></div></div>
+      <div class="row"><div><strong>SP</strong><div class="subtle">${player.sp}/${player.maxSP}</div></div></div>
+      <div class="row"><div><strong>Weapon</strong><div class="subtle">Familiar Sword</div></div></div>
+    `;
+  } else {
+    const rows = Object.keys(inventory).sort().map(k => `
+      <div class="row">
+        <div><strong>${k}</strong><div class="subtle">x${inventory[k]}</div></div>
+      </div>
+    `).join("");
+    menuContent.innerHTML = rows || `<div class="subtle">Inventory empty.</div>`;
+  }
+}
+
+function makeDamagePopup(x, y, value){
+  groundDrops.push({
+    kind:"popup",
+    x, y,
+    value,
+    life:30
+  });
+}
+
+function makeItemDrop(x, y, item){
+  groundDrops.push({
+    kind:"item",
+    x, y,
+    item
+  });
+}
+
+function createFamiliarDaruma(x, y){
+  return {
+    type:"Familiar Daruma",
+    x, y,
+    spawnX:x,
+    spawnY:y,
+    w:22,
+    h:22,
+    hp:5,
+    maxHP:5,
+    alive:true,
+    respawnTimer:0,
+    wanderTimer:0,
+    dirX:0,
+    dirY:0
+  };
+}
+
+function spawnDimensionField(){
+  enemies = [
+    createFamiliarDaruma(220, 150),
+    createFamiliarDaruma(270, 190),
+    createFamiliarDaruma(320, 150),
+    createFamiliarDaruma(260, 250),
+    createFamiliarDaruma(150, 235),
+    createFamiliarDaruma(350, 235)
+  ];
+  groundDrops = [];
+}
+
+function enterTemporalRift(){
+  currentZone = "Temporal Rift";
+  showZone("Temporal Rift");
+  enemies = [];
+  groundDrops = [];
+  spawnBossExitPortal = false;
+  player.x = 145;
+  player.y = 228;
+  logMessage("Entered Temporal Rift.");
+}
+
+function enterDimensionOfMemories(){
+  currentZone = "Dimension of Memories";
+  showZone("Dimension of Memories");
+  player.x = 55;
+  player.y = 210;
+  spawnDimensionField();
+  logMessage("Entered Dimension of Memories.");
+}
+
+function enterCaveOfMemories(){
+  currentZone = "Cave of Memories";
+  showZone("Cave of Memories");
+  enemies = [];
+  groundDrops = [];
+  player.x = 55;
+  player.y = 240;
+  logMessage(`Entered Cave of Memories (${currentDifficulty}).`);
+}
+
+function performAttack(){
+  attackFlash = 8;
+  enemies.forEach(enemy => {
+    if(!enemy.alive) return;
+    const dx = (enemy.x + enemy.w/2) - (player.x + player.w/2);
+    const dy = (enemy.y + enemy.h/2) - (player.y + player.h/2);
+    const dist = Math.hypot(dx,dy);
+    if(dist <= 58){
+      enemy.hp -= 1;
+      makeDamagePopup(enemy.x + 8, enemy.y - 6, "1");
+      if(enemy.hp <= 0){
+        enemy.alive = false;
+        enemy.respawnTimer = 300;
+        if(Math.random() < 0.5){
+          makeItemDrop(enemy.x + 6, enemy.y + 6, "Familiar Fragments");
+        }
+      }
+    }
+  });
+}
+
+bindTap(attackBtn, performAttack);
+bindTap(talkBtn, () => {
+  const px = player.x + player.w/2;
+  const py = player.y + player.h/2;
+
+  if(currentZone === "Temporal Rift"){
+    const portal = { x: canvas.width * 0.82, y: canvas.height * 0.55 };
+    const warding = { x: canvas.width * 0.50, y: canvas.height * 0.15 };
+    const aoi = { x: canvas.width * 0.46, y: canvas.height * 0.52 };
+    const akane = { x: canvas.width * 0.54, y: canvas.height * 0.52 };
+
+    if(Math.hypot(px - portal.x, py - portal.y) <= 32){
+      enterDimensionOfMemories();
+      return;
+    }
+    if(Math.hypot(px - warding.x, py - warding.y) <= 26){
+      logMessage("The Warding is unavailable for now.");
+      return;
+    }
+    if(Math.hypot(px - aoi.x, py - aoi.y) <= 34 || Math.hypot(px - akane.x, py - akane.y) <= 34){
+      logMessage("They have no interactions yet.");
+      return;
+    }
+    logMessage("Nothing nearby to interact with.");
+    return;
+  }
+
+  if(currentZone === "Dimension of Memories"){
+    const cavePortal = { x: canvas.width * 0.52, y: canvas.height * 0.15 };
+    const riftPortal = { x: 32, y: canvas.height * 0.85 };
+
+    if(Math.hypot(px - cavePortal.x, py - cavePortal.y) <= 24){
+      dungeonPanel.style.display = "block";
+      return;
+    }
+    if(Math.hypot(px - riftPortal.x, py - riftPortal.y) <= 24){
+      enterTemporalRift();
+      return;
+    }
+    logMessage("Nothing nearby to interact with.");
+    return;
+  }
+
+  if(currentZone === "Cave of Memories"){
+    logMessage("Dungeon floor placeholder is active.");
+  }
+});
+
+function drawTemporalRift(){
+  const w = canvas.width;
+  const h = canvas.height;
+
+  ctx.fillStyle = "#dfe4ec";
+  ctx.fillRect(0,0,w,h);
+
+  ctx.fillStyle = "#f4f0dd";
+  ctx.beginPath();
+  ctx.ellipse(w*0.5, h*0.58, w*0.26, h*0.18, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(0,0,0,0.18)";
+  ctx.fillRect(0,0,w,28);
+  ctx.fillRect(0,h-28,w,28);
+  ctx.fillRect(0,0,25,h);
+  ctx.fillRect(w-25,0,25,h);
+
+  ctx.strokeStyle = "rgba(94,142,255,0.80)";
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.ellipse(w*0.5, h*0.58, w*0.45, h*0.31, 0, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.strokeStyle = "rgba(255,118,212,0.65)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.ellipse(w*0.5, h*0.58, w*0.42, h*0.285, 0, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.fillStyle = "#bfc6d1";
+  ctx.fillRect(w*0.47, h*0.37, 12, 56);
+  ctx.fillStyle = "#f5f0b0";
+  ctx.beginPath();
+  ctx.arc(w*0.476 + 6, h*0.35, 10, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#7fd1ff";
+  ctx.fillRect(w*0.44, h*0.51, 12, 18);
+
+  ctx.fillStyle = "#ff88a8";
+  ctx.fillRect(w*0.52, h*0.51, 12, 18);
+
+  ctx.fillStyle = "rgba(74,168,255,0.85)";
+  ctx.beginPath();
+  ctx.arc(w*0.82, h*0.55, 18, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(160,110,255,0.80)";
+  ctx.beginPath();
+  ctx.arc(w*0.50, h*0.15, 16, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawDimensionOfMemories(){
+  const w = canvas.width;
+  const h = canvas.height;
+
+  ctx.fillStyle = "#8d958b";
+  ctx.fillRect(0,0,w,h);
+
+  ctx.fillStyle = "#697163";
+  ctx.fillRect(0,h-50,w,50);
+
+  ctx.fillStyle = "rgba(90,90,90,0.38)";
+  for(let i=0;i<9;i++){
+    ctx.fillRect(16 + i*34, 42 + (i%3)*48, 9, 34);
+  }
+
+  ctx.fillStyle = "#6ca3ff";
+  ctx.beginPath();
+  ctx.arc(w*0.52, h*0.15, 14, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(120,170,255,0.85)";
+  ctx.beginPath();
+  ctx.arc(30, h*0.85, 14, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function drawCaveOfMemories(){
+  const w = canvas.width;
+  const h = canvas.height;
+  ctx.fillStyle = "#6d6b66";
+  ctx.fillRect(0,0,w,h);
+  ctx.fillStyle = "#585650";
+  ctx.fillRect(0,h-42,w,42);
+
+  ctx.fillStyle = "#8c877a";
+  ctx.fillRect(38, 42, 34, h-84);
+  ctx.fillRect(110, 26, 30, h-120);
+  ctx.fillRect(176, 52, 28, h-90);
+  ctx.fillRect(242, 28, 32, h-110);
+}
+
+function updateEnemies(){
+  enemies.forEach(m => {
+    if(!m.alive){
+      m.respawnTimer--;
+      if(m.respawnTimer <= 0){
+        m.alive = true;
+        m.hp = m.maxHP;
+        m.x = m.spawnX;
+        m.y = m.spawnY;
+      }
+      return;
+    }
+
+    const px = player.x + player.w/2;
+    const py = player.y + player.h/2;
+    const mx = m.x + m.w/2;
+    const my = m.y + m.h/2;
+    const dist = Math.hypot(px - mx, py - my);
+
+    if(dist <= 110){
+      m.x += Math.sign(px - mx) * 0.55;
+      m.y += Math.sign(py - my) * 0.55;
+    } else {
+      m.wanderTimer--;
+      if(m.wanderTimer <= 0){
+        m.wanderTimer = 50 + Math.floor(Math.random() * 90);
+        m.dirX = (Math.random()*2)-1;
+        m.dirY = (Math.random()*2)-1;
+      }
+      m.x += (m.dirX || 0) * 0.22;
+      m.y += (m.dirY || 0) * 0.22;
+
+      const away = Math.hypot(m.x - m.spawnX, m.y - m.spawnY);
+      if(away > 22){
+        m.x += Math.sign(m.spawnX - m.x) * 0.35;
+        m.y += Math.sign(m.spawnY - m.y) * 0.35;
+      }
+    }
+  });
+}
+
+function updateGroundDrops(){
+  for(let i = groundDrops.length - 1; i >= 0; i--){
+    const d = groundDrops[i];
+
+    if(d.kind === "popup"){
+      d.y -= 0.5;
+      d.life--;
+      if(d.life <= 0) groundDrops.splice(i, 1);
+      continue;
+    }
+
+    const px = player.x + player.w/2;
+    const py = player.y + player.h/2;
+    const dist = Math.hypot(px - d.x, py - d.y);
+
+    if(dist <= 28){
+      inventory[d.item] = (inventory[d.item] || 0) + 1;
+      logMessage("Obtained " + d.item);
+      groundDrops.splice(i, 1);
+      renderItemDisplay();
+    }
+  }
 }
 
 function update(){
+  const blocking = (
+    menuPanel.style.display !== "none" ||
+    dungeonPanel.style.display !== "none"
+  );
 
-player.x+=joystick.dx*player.speed
-player.y+=joystick.dy*player.speed
+  if(!blocking){
+    player.moveX = joystick.dx * player.speed;
+    player.moveY = joystick.dy * player.speed;
+    player.x = clamp(player.x + player.moveX, 0, canvas.width - player.w);
+    player.y = clamp(player.y + player.moveY, 0, canvas.height - player.h);
 
-updateMobs()
-updateDrops()
+    if(currentZone === "Dimension of Memories"){
+      updateEnemies();
+      updateGroundDrops();
+    }
+  }
 
-if(attackFlash>0)attackFlash--
+  if(attackFlash > 0) attackFlash--;
+  updateHud();
+}
 
+function drawPlayer(){
+  ctx.fillStyle = "#2f2b3a";
+  ctx.fillRect(player.x + 3, player.y + player.h - 3, player.w - 6, 3);
+
+  ctx.fillStyle = "#2b2234";
+  ctx.fillRect(player.x + 5, player.y + 8, 8, 12);
+
+  ctx.fillStyle = "#f3d7d7";
+  ctx.beginPath();
+  ctx.arc(player.x + 9, player.y + 6, 5, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = "#15101c";
+  ctx.fillRect(player.x + 5, player.y + 1, 8, 4);
+
+  ctx.strokeStyle = "#b572ff";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(player.x + 13, player.y + 13);
+  ctx.lineTo(player.x + 21, player.y + 7);
+  ctx.stroke();
+
+  if(attackFlash > 0){
+    ctx.strokeStyle = "yellow";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(player.x - 6, player.y - 6, player.w + 12, player.h + 12);
+  }
+}
+
+function drawEnemies(){
+  enemies.forEach(m => {
+    if(!m.alive) return;
+    ctx.fillStyle = "#d14a4a";
+    ctx.beginPath();
+    ctx.arc(m.x + m.w/2, m.y + m.h/2, m.w/2, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle = "rgba(0,0,0,0.25)";
+    ctx.fillRect(m.x, m.y - 5, m.w, 3);
+    ctx.fillStyle = "#7cff7c";
+    ctx.fillRect(m.x, m.y - 5, m.w * (m.hp / m.maxHP), 3);
+  });
+}
+
+function drawGroundDrops(){
+  groundDrops.forEach(d => {
+    if(d.kind === "popup"){
+      ctx.fillStyle = "#fff";
+      ctx.font = "14px Arial";
+      ctx.fillText(d.value, d.x, d.y);
+      return;
+    }
+
+    ctx.fillStyle = "#d2a45e";
+    ctx.fillRect(d.x - 6, d.y - 6, 12, 12);
+  });
 }
 
 function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-ctx.clearRect(0,0,canvas.width,canvas.height)
+  if(currentZone === "Temporal Rift") drawTemporalRift();
+  else if(currentZone === "Dimension of Memories") drawDimensionOfMemories();
+  else drawCaveOfMemories();
 
-ctx.fillStyle="#2e2e2e"
-ctx.fillRect(0,0,canvas.width,canvas.height)
+  if(currentZone === "Dimension of Memories"){
+    drawEnemies();
+    drawGroundDrops();
+  }
 
-ctx.fillStyle="#4ec3ff"
-ctx.fillRect(player.x,player.y,player.size,player.size)
-
-if(attackFlash>0){
-ctx.strokeStyle="yellow"
-ctx.lineWidth=4
-ctx.strokeRect(player.x-6,player.y-6,player.size+12,player.size+12)
-}
-
-for(const m of mobs){
-
-if(!m.alive) continue
-
-ctx.fillStyle="#d14a4a"
-ctx.fillRect(m.x,m.y,m.size,m.size)
-
-}
-
-for(const d of drops){
-
-ctx.fillStyle="#f5d46b"
-ctx.fillRect(d.x,d.y,12,12)
-
-}
-
+  drawPlayer();
 }
 
 function loop(){
-update()
-draw()
-requestAnimationFrame(loop)
+  update();
+  draw();
+  requestAnimationFrame(loop);
 }
 
-loop()
-
+enterTemporalRift();
+updateHud();
+renderItemDisplay();
+loop();
 </script>
-
 </body>
 </html>
