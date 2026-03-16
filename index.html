@@ -3,100 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Onigiri 2 v0.42 Combat Test</title>
+<title>Onigiri 2 v0.43</title>
 
 <style>
+
 html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#1a1a1a;
-  touch-action:none;
-  font-family:sans-serif;
+margin:0;
+padding:0;
+width:100%;
+height:100%;
+overflow:hidden;
+background:#1a1a1a;
+touch-action:none;
+font-family:sans-serif;
 }
 
 #gameCanvas{
-  position:absolute;
-  width:100%;
-  height:100%;
-  background:#111;
+position:absolute;
+width:100%;
+height:100%;
+background:#111;
 }
 
 #joystick{
-  position:absolute;
-  left:30px;
-  bottom:40px;
-  width:140px;
-  height:140px;
-  border-radius:50%;
-  background:rgba(255,255,255,0.15);
+position:absolute;
+left:30px;
+bottom:40px;
+width:140px;
+height:140px;
+border-radius:50%;
+background:rgba(255,255,255,0.15);
 }
 
 #stick{
-  position:absolute;
-  left:48px;
-  top:48px;
-  width:44px;
-  height:44px;
-  border-radius:50%;
-  background:#ffb6d9;
+position:absolute;
+left:48px;
+top:48px;
+width:44px;
+height:44px;
+border-radius:50%;
+background:#ffb6d9;
 }
 
 #attackBtn{
-  position:absolute;
-  right:40px;
-  bottom:120px;
-  width:72px;
-  height:72px;
-  border-radius:50%;
-  background:#c8a07d;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#000;
-  font-weight:bold;
-  font-size:18px;
+position:absolute;
+right:40px;
+bottom:120px;
+width:72px;
+height:72px;
+border-radius:50%;
+background:#c8a07d;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+font-size:18px;
 }
 
 #itemBar{
-  position:absolute;
-  right:10px;
-  bottom:10px;
-  display:flex;
-  gap:6px;
+position:absolute;
+right:10px;
+bottom:10px;
+display:flex;
+gap:6px;
 }
 
 .itemSlot{
-  width:28px;
-  height:28px;
-  border-radius:6px;
-  background:#333;
-  border:1px solid #777;
+width:28px;
+height:28px;
+border-radius:6px;
+background:#333;
+border:1px solid #777;
 }
 
 #info{
-  position:absolute;
-  left:10px;
-  bottom:10px;
-  color:white;
-  font-size:12px;
-  background:rgba(0,0,0,0.4);
-  padding:4px 6px;
-  border-radius:6px;
+position:absolute;
+left:10px;
+bottom:10px;
+color:white;
+font-size:12px;
+background:rgba(0,0,0,0.4);
+padding:4px 6px;
+border-radius:6px;
 }
 
 #build{
-  position:absolute;
-  top:8px;
-  right:8px;
-  font-size:10px;
-  color:white;
-  background:rgba(0,0,0,0.5);
-  padding:3px 5px;
-  border-radius:6px;
+position:absolute;
+top:8px;
+right:8px;
+font-size:10px;
+color:white;
+background:rgba(0,0,0,0.5);
+padding:3px 5px;
+border-radius:6px;
 }
+
 </style>
 </head>
 
@@ -105,234 +106,253 @@ html,body{
 <canvas id="gameCanvas"></canvas>
 
 <div id="joystick">
-  <div id="stick"></div>
+<div id="stick"></div>
 </div>
 
 <div id="attackBtn">ATK</div>
 
 <div id="itemBar">
-  <div class="itemSlot"></div>
-  <div class="itemSlot"></div>
-  <div class="itemSlot"></div>
-  <div class="itemSlot"></div>
-  <div class="itemSlot"></div>
+<div class="itemSlot"></div>
+<div class="itemSlot"></div>
+<div class="itemSlot"></div>
+<div class="itemSlot"></div>
+<div class="itemSlot"></div>
 </div>
 
-<div id="info">Move to the red enemy and tap ATK</div>
-<div id="build">v0.42</div>
+<div id="info">Temporal Rift</div>
+<div id="build">v0.43</div>
 
 <script>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+
+const canvas = document.getElementById("gameCanvas")
+const ctx = canvas.getContext("2d")
 
 function resize(){
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
 }
-resize();
-window.addEventListener("resize", resize);
+resize()
+window.addEventListener("resize",resize)
 
-const player = {
-  x: 120,
-  y: 220,
-  size: 30,
-  speed: 3
-};
+const player={
+x:120,
+y:200,
+size:30,
+speed:3
+}
 
-const enemy = {
-  x: 270,
-  y: 220,
-  size: 30,
-  hp: 5,
-  maxHp: 5,
-  alive: true
-};
+let joystick={dx:0,dy:0,id:null}
 
-let joystick = {
-  active: false,
-  dx: 0,
-  dy: 0,
-  id: null
-};
+const joy=document.getElementById("joystick")
+const stick=document.getElementById("stick")
 
-let attackFlashTimer = 0;
-let damagePopups = [];
-
-const joy = document.getElementById("joystick");
-const stick = document.getElementById("stick");
-const attackBtn = document.getElementById("attackBtn");
-
-function updateStick(clientX, clientY){
-  const rect = joy.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top + rect.height / 2;
-
-  let dx = clientX - cx;
-  let dy = clientY - cy;
-
-  const max = 42;
-  const dist = Math.hypot(dx, dy);
-
-  if(dist > max){
-    dx = dx / dist * max;
-    dy = dy / dist * max;
-  }
-
-  joystick.dx = dx / max;
-  joystick.dy = dy / max;
-
-  stick.style.left = (48 + dx) + "px";
-  stick.style.top = (48 + dy) + "px";
+function updateStick(x,y){
+const r=joy.getBoundingClientRect()
+const cx=r.left+r.width/2
+const cy=r.top+r.height/2
+let dx=x-cx
+let dy=y-cy
+const max=42
+const d=Math.hypot(dx,dy)
+if(d>max){dx=dx/d*max;dy=dy/d*max}
+joystick.dx=dx/max
+joystick.dy=dy/max
+stick.style.left=(48+dx)+"px"
+stick.style.top=(48+dy)+"px"
 }
 
 function resetStick(){
-  stick.style.left = "48px";
-  stick.style.top = "48px";
-  joystick.dx = 0;
-  joystick.dy = 0;
+stick.style.left="48px"
+stick.style.top="48px"
+joystick.dx=0
+joystick.dy=0
 }
 
-joy.addEventListener("touchstart", e => {
-  const t = e.changedTouches[0];
-  joystick.active = true;
-  joystick.id = t.identifier;
-  updateStick(t.clientX, t.clientY);
-}, { passive:false });
+joy.addEventListener("touchstart",e=>{
+const t=e.changedTouches[0]
+joystick.id=t.identifier
+updateStick(t.clientX,t.clientY)
+},{passive:false})
 
-joy.addEventListener("touchmove", e => {
-  for(const t of e.changedTouches){
-    if(t.identifier === joystick.id){
-      e.preventDefault();
-      updateStick(t.clientX, t.clientY);
-    }
-  }
-}, { passive:false });
+joy.addEventListener("touchmove",e=>{
+for(const t of e.changedTouches){
+if(t.identifier===joystick.id){
+updateStick(t.clientX,t.clientY)
+}
+}
+},{passive:false})
 
-joy.addEventListener("touchend", e => {
-  for(const t of e.changedTouches){
-    if(t.identifier === joystick.id){
-      joystick.active = false;
-      resetStick();
-    }
-  }
-}, { passive:false });
+joy.addEventListener("touchend",resetStick)
 
-joy.addEventListener("touchcancel", () => {
-  joystick.active = false;
-  resetStick();
-}, { passive:false });
+document.getElementById("attackBtn").addEventListener("touchstart",attack)
 
-attackBtn.addEventListener("touchstart", e => {
-  e.preventDefault();
-  attack();
-}, { passive:false });
-
-attackBtn.addEventListener("click", attack);
+let attackFlash=0
 
 function attack(){
-  attackFlashTimer = 8;
 
-  if(!enemy.alive) return;
+attackFlash=8
 
-  const playerCx = player.x + player.size / 2;
-  const playerCy = player.y + player.size / 2;
-  const enemyCx = enemy.x + enemy.size / 2;
-  const enemyCy = enemy.y + enemy.size / 2;
+for(const mob of mobs){
 
-  const dist = Math.hypot(playerCx - enemyCx, playerCy - enemyCy);
+if(!mob.alive) continue
 
-  if(dist <= 70){
-    enemy.hp -= 1;
+const dist=Math.hypot(player.x-mob.x,player.y-mob.y)
 
-    damagePopups.push({
-      x: enemy.x + 8,
-      y: enemy.y - 4,
-      value: "1",
-      timer: 40
-    });
+if(dist<70){
+mob.hp--
+if(mob.hp<=0){
+mob.alive=false
+spawnDrop(mob.x,mob.y)
+mob.respawn=300
+}
+}
 
-    if(enemy.hp <= 0){
-      enemy.hp = 0;
-      enemy.alive = false;
-      document.getElementById("info").textContent = "Enemy defeated";
-    } else {
-      document.getElementById("info").textContent = "Hit enemy";
-    }
-  } else {
-    document.getElementById("info").textContent = "Attack missed";
-  }
+}
+
+}
+
+const mobs=[]
+
+function spawnMob(x,y){
+mobs.push({
+x:x,
+y:y,
+size:28,
+hp:5,
+alive:true,
+wander:Math.random()*200
+})
+}
+
+spawnMob(400,200)
+spawnMob(450,260)
+spawnMob(350,240)
+
+const drops=[]
+
+function spawnDrop(x,y){
+
+if(Math.random()<0.5){
+
+drops.push({
+x:x,
+y:y,
+item:"Familiar Fragment"
+})
+
+document.getElementById("info").textContent="Familiar Fragment dropped"
+
+}
+
+}
+
+function updateMobs(){
+
+for(const m of mobs){
+
+if(!m.alive){
+m.respawn--
+if(m.respawn<=0){
+m.hp=5
+m.alive=true
+}
+continue
+}
+
+const dist=Math.hypot(player.x-m.x,player.y-m.y)
+
+if(dist<160){
+m.x+=Math.sign(player.x-m.x)*0.6
+m.y+=Math.sign(player.y-m.y)*0.6
+}else{
+m.wander--
+if(m.wander<=0){
+m.dirX=Math.random()*2-1
+m.dirY=Math.random()*2-1
+m.wander=120
+}
+m.x+=m.dirX*0.4
+m.y+=m.dirY*0.4
+}
+
+}
+
+}
+
+function updateDrops(){
+
+for(let i=drops.length-1;i>=0;i--){
+
+const d=drops[i]
+
+const dist=Math.hypot(player.x-d.x,player.y-d.y)
+
+if(dist<40){
+
+document.getElementById("info").textContent="Picked up Familiar Fragment"
+
+drops.splice(i,1)
+
+}
+
+}
+
 }
 
 function update(){
-  player.x += joystick.dx * player.speed;
-  player.y += joystick.dy * player.speed;
 
-  if(player.x < 0) player.x = 0;
-  if(player.y < 0) player.y = 0;
-  if(player.x > canvas.width - player.size) player.x = canvas.width - player.size;
-  if(player.y > canvas.height - player.size) player.y = canvas.height - player.size;
+player.x+=joystick.dx*player.speed
+player.y+=joystick.dy*player.speed
 
-  if(attackFlashTimer > 0) attackFlashTimer--;
+updateMobs()
+updateDrops()
 
-  for(let i = damagePopups.length - 1; i >= 0; i--){
-    damagePopups[i].y -= 0.7;
-    damagePopups[i].timer--;
-    if(damagePopups[i].timer <= 0){
-      damagePopups.splice(i, 1);
-    }
-  }
-}
+if(attackFlash>0)attackFlash--
 
-function drawPlayer(){
-  ctx.fillStyle = "#4ec3ff";
-  ctx.fillRect(player.x, player.y, player.size, player.size);
-
-  if(attackFlashTimer > 0){
-    ctx.strokeStyle = "yellow";
-    ctx.lineWidth = 4;
-    ctx.strokeRect(player.x - 6, player.y - 6, player.size + 12, player.size + 12);
-  }
-}
-
-function drawEnemy(){
-  if(!enemy.alive) return;
-
-  ctx.fillStyle = "#ff5c76";
-  ctx.fillRect(enemy.x, enemy.y, enemy.size, enemy.size);
-
-  ctx.fillStyle = "rgba(0,0,0,0.5)";
-  ctx.fillRect(enemy.x, enemy.y - 8, enemy.size, 4);
-
-  ctx.fillStyle = "#7cff7c";
-  ctx.fillRect(enemy.x, enemy.y - 8, enemy.size * (enemy.hp / enemy.maxHp), 4);
-}
-
-function drawDamagePopups(){
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "16px Arial";
-  for(const pop of damagePopups){
-    ctx.fillText(pop.value, pop.x, pop.y);
-  }
 }
 
 function draw(){
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "#333";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+ctx.clearRect(0,0,canvas.width,canvas.height)
 
-  drawEnemy();
-  drawPlayer();
-  drawDamagePopups();
+ctx.fillStyle="#2e2e2e"
+ctx.fillRect(0,0,canvas.width,canvas.height)
+
+ctx.fillStyle="#4ec3ff"
+ctx.fillRect(player.x,player.y,player.size,player.size)
+
+if(attackFlash>0){
+ctx.strokeStyle="yellow"
+ctx.lineWidth=4
+ctx.strokeRect(player.x-6,player.y-6,player.size+12,player.size+12)
+}
+
+for(const m of mobs){
+
+if(!m.alive) continue
+
+ctx.fillStyle="#d14a4a"
+ctx.fillRect(m.x,m.y,m.size,m.size)
+
+}
+
+for(const d of drops){
+
+ctx.fillStyle="#f5d46b"
+ctx.fillRect(d.x,d.y,12,12)
+
+}
+
 }
 
 function loop(){
-  update();
-  draw();
-  requestAnimationFrame(loop);
+update()
+draw()
+requestAnimationFrame(loop)
 }
 
-loop();
+loop()
+
 </script>
 
 </body>
